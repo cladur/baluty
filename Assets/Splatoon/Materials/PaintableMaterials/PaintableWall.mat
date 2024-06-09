@@ -77,7 +77,7 @@ Material:
     m_Floats:
     - BOOLEAN_7537779AF731407FB2B8FA45F3CE7497: 0
     - Vector1_0de750b9c41b4a5daef844a1599f5ac7: 0.01
-    - Vector1_2871f666316541908d110962eef07f02: 110
+    - Vector1_2871f666316541908d110962eef07f02: 1000
     - Vector1_2c6f3ce4bba145b09c0a22fced0d7f85: 0
     - Vector1_7bf270fe91494824b4209d2dc1faae23: 0.7
     - Vector1_8e760635099b4147956bb9600d13cac2: 0.3
