@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -5,6 +6,7 @@ public class PaintManager : Singleton<PaintManager>{
 
     public Shader texturePaint;
     public Shader extendIslands;
+    public GraffitiManager graffitiManager;
 
     int prepareUVID = Shader.PropertyToID("_PrepareUV");
     int positionID = Shader.PropertyToID("_PainterPosition");
@@ -79,6 +81,15 @@ public class PaintManager : Singleton<PaintManager>{
 
         Graphics.ExecuteCommandBuffer(command);
         command.Clear();
+
+        graffitiManager.PaintPoints.Add(new GraffitiManager.PaintPoint(
+                            paintable,
+                            pos,
+                            radius,
+                            hardness,
+                            strength,
+                            color ?? Color.red));
+
     }
 
 }

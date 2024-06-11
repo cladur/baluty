@@ -5,12 +5,12 @@ public class Paintable : MonoBehaviour {
 
     public float extendsIslandOffset = 1;
 
-    RenderTexture extendIslandsRenderTexture;
-    RenderTexture uvIslandsRenderTexture;
-    RenderTexture maskRenderTexture;
-    RenderTexture supportTexture;
+    public RenderTexture extendIslandsRenderTexture;
+    public RenderTexture uvIslandsRenderTexture;
+    public RenderTexture maskRenderTexture;
+    public RenderTexture supportTexture;
     
-    Renderer rend;
+    public Renderer rend;
 
     int maskTextureID = Shader.PropertyToID("_MaskTexture");
 
@@ -36,6 +36,11 @@ public class Paintable : MonoBehaviour {
         rend = GetComponent<Renderer>();
         rend.material.SetTexture(maskTextureID, extendIslandsRenderTexture);
 
+        Initialize();
+    }
+
+    public void Initialize()
+    {
         PaintManager.instance.initTextures(this);
     }
 
