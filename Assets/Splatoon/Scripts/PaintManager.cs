@@ -6,7 +6,6 @@ public class PaintManager : Singleton<PaintManager>{
 
     public Shader texturePaint;
     public Shader extendIslands;
-    public GraffitiManager graffitiManager;
 
     int prepareUVID = Shader.PropertyToID("_PrepareUV");
     int positionID = Shader.PropertyToID("_PainterPosition");
@@ -34,11 +33,11 @@ public class PaintManager : Singleton<PaintManager>{
     }
 
     public void initTextures(Paintable paintable){
-        RenderTexture mask = paintable.getMask();
-        RenderTexture uvIslands = paintable.getUVIslands();
-        RenderTexture extend = paintable.getExtend();
-        RenderTexture support = paintable.getSupport();
-        Renderer rend = paintable.getRenderer();
+        RenderTexture mask = paintable.GetMask();
+        RenderTexture uvIslands = paintable.GetUVIslands();
+        RenderTexture extend = paintable.GetExtend();
+        RenderTexture support = paintable.GetSupport();
+        Renderer rend = paintable.GetRenderer();
 
         command.SetRenderTarget(mask);
         command.SetRenderTarget(extend);
@@ -54,11 +53,11 @@ public class PaintManager : Singleton<PaintManager>{
 
 
     public void paint(Paintable paintable, Vector3 pos, float radius = 1f, float hardness = .5f, float strength = .5f, Color? color = null){
-        RenderTexture mask = paintable.getMask();
-        RenderTexture uvIslands = paintable.getUVIslands();
-        RenderTexture extend = paintable.getExtend();
-        RenderTexture support = paintable.getSupport();
-        Renderer rend = paintable.getRenderer();
+        RenderTexture mask = paintable.GetMask();
+        RenderTexture uvIslands = paintable.GetUVIslands();
+        RenderTexture extend = paintable.GetExtend();
+        RenderTexture support = paintable.GetSupport();
+        Renderer rend = paintable.GetRenderer();
 
         paintMaterial.SetFloat(prepareUVID, 0);
         paintMaterial.SetVector(positionID, pos);
@@ -81,15 +80,6 @@ public class PaintManager : Singleton<PaintManager>{
 
         Graphics.ExecuteCommandBuffer(command);
         command.Clear();
-
-        graffitiManager.PaintPoints.Add(new GraffitiManager.PaintPoint(
-                            paintable,
-                            pos,
-                            radius,
-                            hardness,
-                            strength,
-                            color ?? Color.red));
-
     }
 
 }

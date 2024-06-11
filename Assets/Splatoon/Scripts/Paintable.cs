@@ -1,42 +1,63 @@
+using System;
+using UnityEditor;
 using UnityEngine;
 
 public class Paintable : MonoBehaviour {
-    const int TEXTURE_SIZE = 1024;
+
+    const int TextureSize = 1024;
+
+    private static readonly string GraffitiFolderPath = "Assets/Materials/Graffiti/";
+
 
     public float extendsIslandOffset = 1;
+    public GraffitiDiscover graffitiDiscover;
 
-    public RenderTexture extendIslandsRenderTexture;
-    public RenderTexture uvIslandsRenderTexture;
-    public RenderTexture maskRenderTexture;
-    public RenderTexture supportTexture;
+
+    private RenderTexture _extendIslandsRenderTexture;
+    private RenderTexture _uvIslandsRenderTexture;
+    private RenderTexture _maskRenderTexture;
+    private RenderTexture _supportTexture;
     
-    public Renderer rend;
+    private Renderer _rend;
 
-    int maskTextureID = Shader.PropertyToID("_MaskTexture");
+    private int _maskTextureID = Shader.PropertyToID("_MaskTexture");
 
-    public RenderTexture getMask() => maskRenderTexture;
-    public RenderTexture getUVIslands() => uvIslandsRenderTexture;
-    public RenderTexture getExtend() => extendIslandsRenderTexture;
-    public RenderTexture getSupport() => supportTexture;
-    public Renderer getRenderer() => rend;
+    private bool _wasPaintedAtLeastOnce;
+
+    public RenderTexture GetMask() => _maskRenderTexture;
+    public RenderTexture GetUVIslands() => _uvIslandsRenderTexture;
+    public RenderTexture GetExtend() => _extendIslandsRenderTexture;
+    public RenderTexture GetSupport() => _supportTexture;
+    public Renderer GetRenderer() => _rend;
 
     void Start() {
-        maskRenderTexture = new RenderTexture(TEXTURE_SIZE, TEXTURE_SIZE, 0);
-        maskRenderTexture.filterMode = FilterMode.Bilinear;
+        _maskRenderTexture = new RenderTexture(TextureSize, TextureSize, 0);
+        _maskRenderTexture.filterMode = FilterMode.Bilinear;
 
-        extendIslandsRenderTexture = new RenderTexture(TEXTURE_SIZE, TEXTURE_SIZE, 0);
-        extendIslandsRenderTexture.filterMode = FilterMode.Bilinear;
+        _extendIslandsRenderTexture = new RenderTexture(TextureSize, TextureSize, 0);
+        _extendIslandsRenderTexture.filterMode = FilterMode.Bilinear;
 
-        uvIslandsRenderTexture = new RenderTexture(TEXTURE_SIZE, TEXTURE_SIZE, 0);
-        uvIslandsRenderTexture.filterMode = FilterMode.Bilinear;
+        _uvIslandsRenderTexture = new RenderTexture(TextureSize, TextureSize, 0);
+        _uvIslandsRenderTexture.filterMode = FilterMode.Bilinear;
 
-        supportTexture = new RenderTexture(TEXTURE_SIZE, TEXTURE_SIZE, 0);
-        supportTexture.filterMode =  FilterMode.Bilinear;
+        _supportTexture = new RenderTexture(TextureSize, TextureSize, 0);
+        _supportTexture.filterMode =  FilterMode.Bilinear;
 
-        rend = GetComponent<Renderer>();
-        rend.material.SetTexture(maskTextureID, extendIslandsRenderTexture);
+        _rend = GetComponent<Renderer>();
+        _rend.material.SetTexture(_maskTextureID, _extendIslandsRenderTexture);
 
         Initialize();
+    }
+
+    private void Update()
+    {
+        if (!Input.GetKeyDown(KeyCode.A))
+        {
+            return;
+        }
+
+        RenderTexture rt = _maskRenderTexture;
+        SaveRenderTexture(rt, gameObject.name + ".png");
     }
 
     public void Initialize()
@@ -44,10 +65,41 @@ public class Paintable : MonoBehaviour {
         PaintManager.instance.initTextures(this);
     }
 
-    void OnDisable(){
-        maskRenderTexture.Release();
-        uvIslandsRenderTexture.Release();
-        extendIslandsRenderTexture.Release();
-        supportTexture.Release();
+    private void OnTriggerEnter(Collider other)
+    {
+        if (_wasPaintedAtLeastOnce || graffitiDiscover is null)
+        {
+            return;
+        }
+
+        if (other.CompareTag("Painter"))
+        {
+            _wasPaintedAtLeastOnce = true;
+            graffitiDiscover.GraffitiPointsDiscovered++;
+        }
+    }
+
+    private void OnDisable(){
+        _maskRenderTexture.Release();
+        _uvIslandsRenderTexture.Release();
+        _extendIslandsRenderTexture.Release();
+        _supportTexture.Release();
+    }
+
+    private static void SaveRenderTexture(RenderTexture rt, string imageName = "Image.png")
+    {
+        RenderTexture.active = rt;
+        Texture2D tex = new Texture2D(rt.width, rt.height, TextureFormat.ARGB32, false);
+        tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
+        RenderTexture.active = null;
+
+        byte[] bytes;
+        bytes = tex.EncodeToPNG();
+
+        string path = $"{GraffitiFolderPath}/{imageName}";
+        System.IO.File.WriteAllBytes(path, bytes);
+        AssetDatabase.ImportAsset(path);
+        AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+        Debug.Log("Saved to " + path);
     }
 }
