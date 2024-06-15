@@ -11,7 +11,7 @@ public class Painter : MonoBehaviour
         RaycastHit hit;
         Debug.DrawRay(ray.origin, ray.direction * maxSprayDistance, Color.red);
 
-        if (Physics.Raycast(ray, out hit, maxSprayDistance))
+        if (Physics.Raycast(ray, out hit, maxSprayDistance, ~LayerMask.GetMask("TagSplineCollider")))
         {
             transform.position = hit.point;
             Paintable p = hit.collider.GetComponent<Paintable>();

@@ -1,8 +1,16 @@
 using TMPro;
 using UnityEngine;
 
+public enum SprayColor
+{
+    Red,
+    Green,
+    Blue
+}
+
 public class SprayCan : MonoBehaviour
 {
+    public SprayColor sprayColor;
     public GameObject sprayPoint;
     public Painter painter;
     public MeshRenderer sprayConeMesh;
@@ -26,23 +34,53 @@ public class SprayCan : MonoBehaviour
     private static readonly int CanFillColorPropertyName = Shader.PropertyToID("_CanFillColor");
     private static readonly int CanColorPropertyName = Shader.PropertyToID("_CanColor");
 
+    public static Color GetColor(SprayColor sprayColor)
+    {
+        switch (sprayColor)
+        {
+            case SprayColor.Red:
+                return Color.red;
+            case SprayColor.Green:
+                return Color.green;
+            case SprayColor.Blue:
+                return Color.blue;
+            default:
+                return Color.white;
+        }
+    }
+
     void Start()
     {
         _rb = gameObject.GetComponent<Rigidbody>();
         sprayConeMesh.gameObject.SetActive(false);
         sprayCanMesh.material.SetColor(CanColorPropertyName, canColor);
-        sprayCanMesh.material.SetColor(CanFillColorPropertyName, GetFillColor());
+        sprayCanMesh.material.SetColor(CanFillColorPropertyName, GetColor(sprayColor));
+        sprayConeMesh.material.SetColor(ColorPropertyName, GetColor(sprayColor));
+    }
+
+    void ShootRaycastForTagSplineColliders()
+    {
+        RaycastHit hit;
+        int layerMask = LayerMask.GetMask("TagSplineCollider");
+        if (Physics.Raycast(sprayPoint.transform.position, sprayPoint.transform.forward, out hit, maxSprayDistance, layerMask))
+        {
+            var tagSplineCollider = hit.collider.GetComponent<TagSplineCollider>();
+            if (tagSplineCollider != null)
+            {
+                tagSplineCollider.OnShotWithPaint(sprayColor);
+            }
+        }
     }
 
     void Update()
     {
-        var currentColor = GetFillColor();
+        var currentColor = GetColor(sprayColor);
 
         if (_isSpraying)
         {
             _paintTimeLeft -= Time.deltaTime;
             painter.Paint(sprayPoint.transform, maxSprayDistance, maxSprayRadius, currentColor);
-            sprayConeMesh.material.SetColor(ColorPropertyName, currentColor);
+            ShootRaycastForTagSplineColliders();
 
             if (_paintTimeLeft <= 0)
             {
@@ -78,13 +116,6 @@ public class SprayCan : MonoBehaviour
     {
         _isSpraying = false;
         sprayConeMesh.gameObject.SetActive(false);
-    }
-
-    private static Color GetFillColor()
-    {
-        float hue = 0.05f * Time.timeSinceLevelLoad % 1.0f;
-        Color color = Color.HSVToRGB(hue, 1.0f, 1.0f);
-        return color;
     }
 
     private void UpdateSprayCanColor(Color currentColor)
