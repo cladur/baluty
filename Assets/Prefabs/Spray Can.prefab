@@ -335,7 +335,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1806393157527773413}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 0.5
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -554,8 +554,9 @@ MonoBehaviour:
   m_StartingSingleGrabTransformers: []
   m_StartingMultipleGrabTransformers: []
   m_AddDefaultGrabTransformers: 1
-  VelocityThreshold: 2
-  JumpAngleInDegrees: 60
+  velocityThreshold: 2
+  jumpAngleInDegrees: 60
+  snapDistance: 0.5
 --- !u!1 &7108446888409502151
 GameObject:
   m_ObjectHideFlags: 0

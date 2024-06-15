@@ -39,7 +39,6 @@ public class GraffitiDiscover : MonoBehaviour
         graffitiPointsCount = paintPointsParentGameObject.transform.childCount;
         graffitiPointsCount2 = paintPointsParentGameObject2.transform.childCount;
         graffitiPointsCount3 = paintPointsParentGameObject3.transform.childCount;
-        Debug.Log("Point count: " + graffitiPointsCount);
 
         graffiti.SetFillPercent(0);
 
