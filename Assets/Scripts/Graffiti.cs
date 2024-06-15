@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
@@ -36,10 +37,24 @@ public class Graffiti : MonoBehaviour
 
         if (texture is not null)
         {
-            _material.SetTexture(TexturePropertyName, texture);
+            try
+            {
+                _material.SetTexture(TexturePropertyName, texture);
+            }
+            catch (Exception ex)
+            {
+                // Ignore ;)
+            }
         }
 
-        _material.SetFloat(FillPercentPropertyName, fillPercent);
+        try
+        {
+            _material.SetFloat(FillPercentPropertyName, fillPercent);
+        }
+        catch (Exception ex)
+        {
+            // Ignore ;)
+        }
     }
 
     public void SetFillPercent(float fillValue)
