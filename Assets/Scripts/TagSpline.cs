@@ -1,20 +1,38 @@
 using System.Collections.Generic;
 using UnityEditor.Rendering;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.Splines;
 
+[ExecuteInEditMode]
 public class TagSpline : MonoBehaviour
 {
     public SprayColor tagSplineColor;
+    public Texture2D decalTexture;
     public TagSplineCollider tagSplineColliderPrefab;
     public int splineInstancesCount = 10;
 
     public TagSpot tagSpot;
     private SplineContainer _splineContainer;
     private SplineExtrude _splineExtrude;
+    private DecalProjector _decalProjector;
 
     private List<TagSplineCollider> _splineInstances = new List<TagSplineCollider>();
     private List<int> indicesDone = new List<int>();
+
+    void OnValidate()
+    {
+        _splineContainer = GetComponent<SplineContainer>();
+        _splineExtrude = GetComponent<SplineExtrude>();
+
+        var mesh = GetComponent<MeshRenderer>();
+        mesh.material = new Material(mesh.material);
+        mesh.material.SetColor("_Color", SprayCan.GetColor(tagSplineColor));
+
+        var decal = GetComponent<DecalProjector>();
+        decal.material = new Material(decal.material);
+        decal.material.SetTexture("_Texture", decalTexture);
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -22,8 +40,15 @@ public class TagSpline : MonoBehaviour
         _splineContainer = GetComponent<SplineContainer>();
         _splineExtrude = GetComponent<SplineExtrude>();
 
-        var mesh = GetComponent<MeshRenderer>().sharedMaterial;
-        mesh.SetColor("_Color", SprayCan.GetColor(tagSplineColor));
+        var mesh = GetComponent<MeshRenderer>();
+        mesh.material = new Material(mesh.material);
+        mesh.material.SetColor("_Color", SprayCan.GetColor(tagSplineColor));
+
+        _decalProjector = GetComponent<DecalProjector>();
+        _decalProjector.material = new Material(_decalProjector.material);
+        _decalProjector.material.SetTexture("_Texture", decalTexture);
+
+        _decalProjector.enabled = false;
 
         if (_splineContainer != null)
         {
@@ -107,6 +132,7 @@ public class TagSpline : MonoBehaviour
 
             ResetColliders();
             gameObject.SetActive(false);
+            _decalProjector.enabled = true;
             tagSpot.OnTagSplineFinished();
         }
 
