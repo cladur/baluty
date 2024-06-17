@@ -8,6 +8,7 @@ TagManager:
   - Hand
   - SprayCan
   - Enemy
+  - EnemyLerp
   layers:
   - Default
   - TransparentFX
@@ -16,8 +17,8 @@ TagManager:
   - Water
   - UI
   - TagSplineCollider
-  - 
-  - 
+  - EnemyLerpZone
+  - SprayCan
   - 
   - 
   - 

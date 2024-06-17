@@ -22,12 +22,15 @@ public class SprayCan : MonoBehaviour
     public float maxSprayDistance = 1.0f;
     public float velocityToShakeThreshold = 1.0f;
     public float shakeRegenMultiplier = 1.0f;
+    public float resetWasInHandTime = 3.0f;
 
     private Rigidbody _rb;
 
     private float _paintTimeLeft = 5.0f;
     private float _maxPaintTime = 15.0f;
     private bool _isSpraying;
+    private Transform _lerpTarget;
+    private bool _wasInHand;
 
     private static readonly int ColorPropertyName = Shader.PropertyToID("_Color");
     private static readonly int CanColorFillPercentPropertyName = Shader.PropertyToID("_FillHeight");
@@ -76,6 +79,18 @@ public class SprayCan : MonoBehaviour
     {
         var currentColor = GetColor(sprayColor);
 
+        if (PlayerManager.IsGrabbed(name))
+        {
+            if (_rb.velocity.magnitude > 0.25f)
+            {
+                _wasInHand = true;
+            }
+        }
+        else if (_wasInHand)
+        {
+            Invoke(nameof(ResetWasInHand), resetWasInHandTime);
+        }
+
         if (_isSpraying)
         {
             _paintTimeLeft -= Time.deltaTime;
@@ -100,6 +115,13 @@ public class SprayCan : MonoBehaviour
         }
 
         UpdateSprayCanColor(currentColor);
+
+        if (_lerpTarget is null || !_wasInHand)
+        {
+            return;
+        }
+
+        transform.position = Vector3.Lerp(transform.position, _lerpTarget.position, Time.deltaTime * 5);
     }
 
     public void StartSpray()
@@ -125,13 +147,30 @@ public class SprayCan : MonoBehaviour
         sprayCanMesh.material.SetColor(CanFillColorPropertyName, currentColor);
     }
 
-    void OnTriggerEnter(Collider other)
+    private void ResetWasInHand()
     {
+        _wasInHand = false;
+        _lerpTarget = null;
+    }
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (_lerpTarget is null && other.gameObject.CompareTag("EnemyLerp") && _wasInHand)
+        {
+            _rb.velocity = Vector3.zero;
+            var enemy = other.transform.parent;
+            _lerpTarget = enemy;
+        }
+
         if (other.gameObject.CompareTag("Enemy"))
         {
             Debug.Log("Enemy hit!");
             var enemy = other.gameObject.GetComponent<Enemy>();
             enemy.OnHit();
+
+            _lerpTarget = null;
+            _wasInHand = false;
         }
     }
 }

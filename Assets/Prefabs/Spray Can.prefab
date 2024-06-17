@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4136190715266800990}
   - component: {fileID: 9003455606045182889}
   - component: {fileID: 5882978104490273773}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: DebugText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -182,7 +182,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9120517051007197469}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -217,7 +217,7 @@ GameObject:
   - component: {fileID: 3583699173771580258}
   - component: {fileID: 2219007791466421568}
   - component: {fileID: 3684478030410219322}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Dzyndzel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -301,7 +301,7 @@ GameObject:
   - component: {fileID: 6306247055624870134}
   - component: {fileID: 2482069832249517165}
   - component: {fileID: 9214795655079804261}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Spray Can
   m_TagString: SprayCan
   m_Icon: {fileID: 0}
@@ -377,6 +377,7 @@ MonoBehaviour:
   maxSprayDistance: 0.4
   velocityToShakeThreshold: 1
   shakeRegenMultiplier: 4
+  resetWasInHandTime: 3
 --- !u!114 &9214795655079804261
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -569,7 +570,7 @@ GameObject:
   - component: {fileID: 627001848279882019}
   - component: {fileID: 7219719214202533017}
   - component: {fileID: 3479931795119837676}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -674,7 +675,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3329579788349920971}
   - component: {fileID: 4750431209696934167}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Painter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -717,7 +718,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 643965789513148986}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Spray Point
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -825,6 +826,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: 83ae73cd40bbfb040bb54a2e92c7dd36,
         type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 83ae73cd40bbfb040bb54a2e92c7dd36,
+        type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: -876546973899608171, guid: 4fbf141f5cde3674089efae14bc31e1c,
@@ -837,7 +843,7 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 83ae73cd40bbfb040bb54a2e92c7dd36,
         type: 3}
       propertyPath: m_Layer
-      value: 2
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 83ae73cd40bbfb040bb54a2e92c7dd36,
         type: 3}
