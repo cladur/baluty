@@ -8,7 +8,8 @@ using UnityEngine.Splines;
 public class TagSpline : MonoBehaviour
 {
     public SprayColor tagSplineColor;
-    public Texture2D decalTexture;
+    public Texture2D playerDecalTexture;
+    public Texture2D enemyDecalTexture;
     public TagSplineCollider tagSplineColliderPrefab;
     public int splineInstancesCount = 10;
 
@@ -16,8 +17,18 @@ public class TagSpline : MonoBehaviour
     private SplineContainer _splineContainer;
     private SplineExtrude _splineExtrude;
     private DecalProjector _decalProjector;
+    private MeshRenderer _mesh;
 
-    private List<TagSplineCollider> _splineInstances = new List<TagSplineCollider>();
+    public enum TagSplineOccupant
+    {
+        None,
+        Player,
+        Enemy
+    }
+
+    public TagSplineOccupant occupant = TagSplineOccupant.None;
+
+    private List<TagSplineCollider> _splineColliders = new List<TagSplineCollider>();
     private List<int> indicesDone = new List<int>();
 
     void OnValidate()
@@ -31,7 +42,7 @@ public class TagSpline : MonoBehaviour
 
         var decal = GetComponent<DecalProjector>();
         decal.material = new Material(decal.material);
-        decal.material.SetTexture("_Texture", decalTexture);
+        decal.material.SetTexture("_Texture", playerDecalTexture);
     }
 
     // Start is called before the first frame update
@@ -40,30 +51,30 @@ public class TagSpline : MonoBehaviour
         _splineContainer = GetComponent<SplineContainer>();
         _splineExtrude = GetComponent<SplineExtrude>();
 
-        var mesh = GetComponent<MeshRenderer>();
-        mesh.material = new Material(mesh.material);
-        mesh.material.SetColor("_Color", SprayCan.GetColor(tagSplineColor));
+        _mesh = GetComponent<MeshRenderer>();
+        _mesh.material = new Material(_mesh.material);
+        _mesh.material.SetColor("_Color", SprayCan.GetColor(tagSplineColor));
 
         _decalProjector = GetComponent<DecalProjector>();
         _decalProjector.material = new Material(_decalProjector.material);
-        _decalProjector.material.SetTexture("_Texture", decalTexture);
+        _decalProjector.material.SetTexture("_Texture", playerDecalTexture);
 
         _decalProjector.enabled = false;
 
-        if (_splineContainer != null)
+        if (Application.isPlaying && _splineContainer != null)
         {
             // Spawn 10 TagSplineColliders along the spline
             for (int i = 0; i < splineInstancesCount; i++)
             {
                 var tagSplineCollider = Instantiate(tagSplineColliderPrefab, transform);
-                tagSplineCollider.transform.position = _splineContainer.EvaluatePosition(i / (float)(splineInstancesCount - 1));
-                tagSplineCollider.transform.forward = _splineContainer.EvaluateTangent(i / (float)(splineInstancesCount - 1));
+                tagSplineCollider.transform.position = _splineContainer.EvaluatePosition(0.05f + (i / (float)(splineInstancesCount - 1)) * 0.9f);
+                tagSplineCollider.transform.forward = _splineContainer.EvaluateTangent(0.05f + (i / (float)(splineInstancesCount - 1)) * 0.9f);
                 // tagSplineCollider.transform.position += tagSplineCollider.transform.up * 0.05f;
                 tagSplineCollider.colliderQuality = ColliderQuality.Perfect;
                 tagSplineCollider.index = i;
                 tagSplineCollider.TagSpline = this;
                 tagSplineCollider.name = $"TagSplineCollider_{i}";
-                _splineInstances.Add(tagSplineCollider);
+                _splineColliders.Add(tagSplineCollider);
             }
 
             var offset = 0.06f;
@@ -73,37 +84,37 @@ public class TagSpline : MonoBehaviour
             for (int i = 0; i < splineInstancesCount; i++)
             {
                 var tagSplineCollider = Instantiate(tagSplineColliderPrefab, transform);
-                tagSplineCollider.transform.position = _splineContainer.EvaluatePosition(i / (float)(splineInstancesCount - 1));
-                tagSplineCollider.transform.forward = _splineContainer.EvaluateTangent(i / (float)(splineInstancesCount - 1));
+                tagSplineCollider.transform.position = _splineContainer.EvaluatePosition(0.05f + (i / (float)(splineInstancesCount - 1)) * 0.9f);
+                tagSplineCollider.transform.forward = _splineContainer.EvaluateTangent(0.05f + (i / (float)(splineInstancesCount - 1)) * 0.9f);
                 tagSplineCollider.transform.position += tagSplineCollider.transform.up * offset;
                 tagSplineCollider.GetComponent<BoxCollider>().size = new Vector3(0.1f, goodWidth, 0.1f);
                 tagSplineCollider.colliderQuality = ColliderQuality.Good;
                 tagSplineCollider.index = i;
                 tagSplineCollider.TagSpline = this;
                 tagSplineCollider.name = $"TagSplineCollider_{i}";
-                _splineInstances.Add(tagSplineCollider);
+                _splineColliders.Add(tagSplineCollider);
             }
 
             // Spawn 10 TagSplineColliders along the spline
             for (int i = 0; i < splineInstancesCount; i++)
             {
                 var tagSplineCollider = Instantiate(tagSplineColliderPrefab, transform);
-                tagSplineCollider.transform.position = _splineContainer.EvaluatePosition(i / (float)(splineInstancesCount - 1));
-                tagSplineCollider.transform.forward = _splineContainer.EvaluateTangent(i / (float)(splineInstancesCount - 1));
+                tagSplineCollider.transform.position = _splineContainer.EvaluatePosition(0.05f + (i / (float)(splineInstancesCount - 1)) * 0.9f);
+                tagSplineCollider.transform.forward = _splineContainer.EvaluateTangent(0.05f + (i / (float)(splineInstancesCount - 1)) * 0.9f);
                 tagSplineCollider.transform.position -= tagSplineCollider.transform.up * offset;
                 tagSplineCollider.GetComponent<BoxCollider>().size = new Vector3(0.1f, goodWidth, 0.1f);
                 tagSplineCollider.colliderQuality = ColliderQuality.Good;
                 tagSplineCollider.index = i;
                 tagSplineCollider.TagSpline = this;
                 tagSplineCollider.name = $"TagSplineCollider_{i}";
-                _splineInstances.Add(tagSplineCollider);
+                _splineColliders.Add(tagSplineCollider);
             }
         }
     }
 
     void ResetColliders()
     {
-        foreach (var splineInstance in _splineInstances)
+        foreach (var splineInstance in _splineColliders)
         {
             splineInstance.gameObject.SetActive(true);
         }
@@ -114,7 +125,6 @@ public class TagSpline : MonoBehaviour
     {
         if (color != tagSplineColor)
         {
-            Debug.Log($"TagSpline_{name} was hit with the wrong color!");
             return false;
         }
 
@@ -131,12 +141,37 @@ public class TagSpline : MonoBehaviour
             Debug.Log($"TagSpline_{name} was finished!");
 
             ResetColliders();
-            gameObject.SetActive(false);
-            _decalProjector.enabled = true;
-            tagSpot.OnTagSplineFinished();
+            OvertakeByPlayer();
         }
 
         return true;
+    }
+
+    public void OvertakeByPlayer()
+    {
+        occupant = TagSplineOccupant.Player;
+        _decalProjector.enabled = true;
+        _decalProjector.material.SetTexture("_Texture", playerDecalTexture);
+        UpdateVisibility(false);
+        tagSpot.OnTagSplineChanged(true);
+    }
+
+    public void OvertakeByEnemy()
+    {
+        occupant = TagSplineOccupant.Enemy;
+        _decalProjector.enabled = true;
+        _decalProjector.material.SetTexture("_Texture", enemyDecalTexture);
+        UpdateVisibility(true);
+        tagSpot.OnTagSplineChanged(false);
+    }
+
+    public void UpdateVisibility(bool isActive)
+    {
+        _mesh.enabled = isActive;
+        foreach (var splineInstance in _splineColliders)
+        {
+            splineInstance.gameObject.SetActive(isActive);
+        }
     }
 
     // Update is called once per frame

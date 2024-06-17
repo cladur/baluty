@@ -124,4 +124,14 @@ public class SprayCan : MonoBehaviour
         sprayCanMesh.material.SetFloat(CanColorFillPercentPropertyName, fillPercent);
         sprayCanMesh.material.SetColor(CanFillColorPropertyName, currentColor);
     }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Enemy"))
+        {
+            Debug.Log("Enemy hit!");
+            var enemy = other.gameObject.GetComponent<Enemy>();
+            enemy.OnHit();
+        }
+    }
 }

@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Painter
   - Hand
+  - SprayCan
+  - Enemy
   layers:
   - Default
   - TransparentFX

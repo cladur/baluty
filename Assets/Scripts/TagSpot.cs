@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.Video;
@@ -13,32 +15,24 @@ public class TagSpot : MonoBehaviour
         Large
     }
 
-    public enum TagSpotOccupant
-    {
-        None,
-        Player,
-        Enemy
-    }
-
     [Header("Internal")]
-    public DecalProjector decal;
-
-
-    [Header("Tag Spot Settings")]
-    public TagSpotSize size;
-    public TagSpotOccupant occupant = TagSpotOccupant.None;
+    public GameObject enemy;
 
     public List<TagSpline> tagSplines = new List<TagSpline>();
 
     int _splinesOccupiedByPlayer = 0;
     int _splinesOccupiedByEnemy = 0;
-
-    private Painter _painter;
+    bool _enemyPresent = false;
+    float _timeSinceLastEnemySpawn = 0.0f;
+    float _timeSincePlayerSprayed = 0.0f;
+    TagSpline tagSplineToOverrideByEnemy = null;
 
     // Start is called before the first frame update
     void Start()
     {
-        _painter = GetComponent<Painter>();
+        // Hide the enemy
+        enemy.SetActive(false);
+
         // For child tag splines
         foreach (Transform child in transform)
         {
@@ -49,12 +43,25 @@ public class TagSpot : MonoBehaviour
                 tagSpline.tagSpot = this;
             }
         }
+
+        GameManager.Instance.tagSpots.Add(this);
     }
 
     // Update is called once per frame
     void Update()
     {
+        _timeSinceLastEnemySpawn += Time.deltaTime;
+        _timeSincePlayerSprayed += Time.deltaTime;
+    }
 
+    public float GetPlayerPercentage()
+    {
+        return (float)_splinesOccupiedByPlayer / tagSplines.Count;
+    }
+
+    public float GetEnemyPercentage()
+    {
+        return (float)_splinesOccupiedByEnemy / tagSplines.Count;
     }
 
     public void ResetTagSpot()
@@ -64,7 +71,8 @@ public class TagSpot : MonoBehaviour
 
         for (int i = 0; i < tagSplines.Count; i++)
         {
-            tagSplines[i].gameObject.SetActive(true);
+            tagSplines[i].UpdateVisibility(true);
+
         }
         ClearPainting();
     }
@@ -89,14 +97,82 @@ public class TagSpot : MonoBehaviour
         }
     }
 
-    public void OnTagSplineFinished()
+    public void OnTagSplineChanged(bool byPlayer)
     {
-        _splinesOccupiedByPlayer += 1;
-        _splinesOccupiedByEnemy = tagSplines.Count - _splinesOccupiedByPlayer;
+        RecalculateOccupancies();
+        if (byPlayer)
+        {
+            _timeSincePlayerSprayed = 0.0f;
+        }
+    }
 
-        Debug.Log($"TagSpot_{name} has {_splinesOccupiedByPlayer} splines occupied by the player and {_splinesOccupiedByEnemy} splines occupied by the enemy.");
+    public void SpawnEnemy()
+    {
+        // Pick a random tag spline unoccupied by the enemy
+        var randomTagSplines = tagSplines.OrderBy(x => UnityEngine.Random.value).ToList();
 
-        // Wait for 3 seconds before resetting the tag spot
-        Invoke("ResetTagSpot", 3f);
+        foreach (var tagSpline in randomTagSplines)
+        {
+            if (tagSpline.occupant != TagSpline.TagSplineOccupant.Enemy)
+            {
+                ShowEnemy();
+                tagSplineToOverrideByEnemy = tagSpline;
+                Invoke(nameof(FinishEnemySpray), GameManager.EnemySprayDuration);
+                break;
+            }
+        }
+    }
+
+    void ShowEnemy()
+    {
+        enemy.SetActive(true);
+        _enemyPresent = true;
+        _timeSinceLastEnemySpawn = 0.0f;
+    }
+
+    public void FinishEnemySpray()
+    {
+        enemy.SetActive(false);
+
+        if (_enemyPresent && tagSplineToOverrideByEnemy != null)
+        {
+            tagSplineToOverrideByEnemy.OvertakeByEnemy();
+            RecalculateOccupancies();
+            Debug.Log($"TagSpot_{name} overriden by enemy.");
+        }
+
+        _enemyPresent = false;
+    }
+
+    public bool CanSpawnEnemy()
+    {
+        bool notFullyOccupied = GetEnemyPercentage() < 1.0f;
+        bool enoughTimeSinceLastSpawn = _timeSinceLastEnemySpawn > 10.0f;
+        bool enoughTimeSincePlayerSprayed = _timeSincePlayerSprayed > 10.0f;
+        return !_enemyPresent && notFullyOccupied && enoughTimeSinceLastSpawn && enoughTimeSincePlayerSprayed;
+    }
+
+    void RecalculateOccupancies()
+    {
+        _splinesOccupiedByPlayer = 0;
+        _splinesOccupiedByEnemy = 0;
+
+        foreach (var tagSpline in tagSplines)
+        {
+            if (tagSpline.occupant == TagSpline.TagSplineOccupant.Player)
+            {
+                _splinesOccupiedByPlayer += 1;
+            }
+            else if (tagSpline.occupant == TagSpline.TagSplineOccupant.Enemy)
+            {
+                _splinesOccupiedByEnemy += 1;
+            }
+        }
+    }
+
+    public void OnEnemyHit()
+    {
+        _enemyPresent = false;
+        FinishEnemySpray();
     }
 }
