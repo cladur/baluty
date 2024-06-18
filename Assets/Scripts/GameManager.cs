@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour
 
     public static float playerScore = 0.0f;
     public static float enemyScore = 0.0f;
-    public static float EnemySprayDuration = 10.0f;
+    public static float enemySprayDuration = 10.0f;
 
     public delegate void ScoreUpdated(float playerScore, float enemyScore);
     public static event ScoreUpdated OnScoreUpdated;

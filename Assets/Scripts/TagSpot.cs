@@ -26,10 +26,13 @@ public class TagSpot : MonoBehaviour
     float _timeSinceLastEnemySpawn = 0.0f;
     float _timeSincePlayerSprayed = 0.0f;
     TagSpline tagSplineToOverrideByEnemy = null;
+    AudioSource _sprayAudioSource;
 
     // Start is called before the first frame update
     void Start()
     {
+        _sprayAudioSource = GetComponent<AudioSource>();
+
         // Hide the enemy
         enemy.SetActive(false);
 
@@ -117,7 +120,7 @@ public class TagSpot : MonoBehaviour
             {
                 ShowEnemy();
                 tagSplineToOverrideByEnemy = tagSpline;
-                Invoke(nameof(FinishEnemySpray), GameManager.EnemySprayDuration);
+                Invoke(nameof(FinishEnemySpray), GameManager.enemySprayDuration);
                 break;
             }
         }
@@ -128,6 +131,7 @@ public class TagSpot : MonoBehaviour
         enemy.SetActive(true);
         _enemyPresent = true;
         _timeSinceLastEnemySpawn = 0.0f;
+        _sprayAudioSource.Play();
     }
 
     public void FinishEnemySpray()
@@ -142,6 +146,7 @@ public class TagSpot : MonoBehaviour
         }
 
         _enemyPresent = false;
+        _sprayAudioSource.Stop();
     }
 
     public bool CanSpawnEnemy()
@@ -149,7 +154,8 @@ public class TagSpot : MonoBehaviour
         bool notFullyOccupied = GetEnemyPercentage() < 1.0f;
         bool enoughTimeSinceLastSpawn = _timeSinceLastEnemySpawn > 10.0f;
         bool enoughTimeSincePlayerSprayed = _timeSincePlayerSprayed > 10.0f;
-        return !_enemyPresent && notFullyOccupied && enoughTimeSinceLastSpawn && enoughTimeSincePlayerSprayed;
+        bool playerFarEnough = Vector3.Distance(transform.position, PlayerManager.Instance.transform.position) > 5.0f;
+        return !_enemyPresent && notFullyOccupied && enoughTimeSinceLastSpawn && enoughTimeSincePlayerSprayed && playerFarEnough;
     }
 
     void RecalculateOccupancies()

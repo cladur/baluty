@@ -18,6 +18,9 @@ public class SprayCan : MonoBehaviour
     public TextMeshPro debugText;
     public Color canColor;
 
+    public AudioSource fireAudioSource;
+    public AudioSource shakeAudioSource;
+
     public float maxSprayRadius = 0.1f;
     public float maxSprayDistance = 1.0f;
     public float velocityToShakeThreshold = 1.0f;
@@ -108,11 +111,14 @@ public class SprayCan : MonoBehaviour
         // If spray can is shaken, add to paint time
         if (_rb.velocity.magnitude > velocityToShakeThreshold &&
             !_isSpraying &&
-            _paintTimeLeft < _maxPaintTime)
+            _paintTimeLeft < _maxPaintTime && PlayerManager.IsGrabbed(name))
         {
             _paintTimeLeft += Time.deltaTime * shakeRegenMultiplier;
             _paintTimeLeft = Mathf.Clamp(_paintTimeLeft, 0, _maxPaintTime);
         }
+
+        // shakeAudioSource.volume = Mathf.Clamp01((_rb.velocity.magnitude - 1.0f) / 4);
+        // shakeAudioSource.pitch = 0.8f + 0.4f * Mathf.Clamp01((_rb.velocity.magnitude - 1.0f) / 4);
 
         UpdateSprayCanColor(currentColor);
 
@@ -132,12 +138,14 @@ public class SprayCan : MonoBehaviour
         }
         _isSpraying = true;
         sprayConeMesh.gameObject.SetActive(true);
+        fireAudioSource.Play();
     }
 
     public void StopSpray()
     {
         _isSpraying = false;
         sprayConeMesh.gameObject.SetActive(false);
+        fireAudioSource.Stop();
     }
 
     private void UpdateSprayCanColor(Color currentColor)

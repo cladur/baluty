@@ -116,7 +116,7 @@ public class TagSpline : MonoBehaviour
     {
         foreach (var splineInstance in _splineColliders)
         {
-            splineInstance.gameObject.SetActive(true);
+            splineInstance.boxCollider.enabled = true;
         }
         indicesDone.Clear();
     }
