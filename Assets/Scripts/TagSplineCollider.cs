@@ -32,8 +32,7 @@ public class TagSplineCollider : MonoBehaviour
             // Instantiate empty object
             var empty = new GameObject();
             empty.transform.position = transform.position + transform.right * 0.1f;
-            empty.transform.rotation = Quaternion.identity;
-            var scorePopup = Instantiate(scorePopupPrefab, transform.position, Quaternion.identity, empty.transform);
+            var scorePopup = Instantiate(scorePopupPrefab, transform.position, Quaternion.LookRotation(-transform.right), empty.transform);
             scorePopup.StartAnimation(colliderQuality);
             Destroy(scorePopup.gameObject, 1.0f);
             Destroy(empty, 1.0f);

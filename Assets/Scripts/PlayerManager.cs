@@ -9,9 +9,6 @@ public class PlayerManager : MonoBehaviour
     public XRDirectInteractor leftHand;
     public XRDirectInteractor rightHand;
 
-    public XRRayInteractor leftTeleport;
-    public XRRayInteractor rightTeleport;
-
     public XRInteractionManager interactionManager;
 
     public LayerMask groundLayerMask;
@@ -32,7 +29,7 @@ public class PlayerManager : MonoBehaviour
             return;
         }
 
-        if (!hit.transform.parent.gameObject.TryGetComponent(typeof(TeleportationArea), out var teleportationArea))
+        if (!hit.transform.gameObject.TryGetComponent(typeof(TeleportationArea), out var teleportationArea))
         {
             return;
         }
