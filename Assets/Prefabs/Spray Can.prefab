@@ -378,7 +378,7 @@ MonoBehaviour:
   shakeAudioSource: {fileID: 3572333305700239411}
   flyAudioSource: {fileID: 6527693124008213842}
   singleShotAudioSource: {fileID: 367746533394373128}
-  enemyHitSound: {fileID: 8300000, guid: b2d1360a4412b5548b6d2a888a257e87, type: 3}
+  enemyHitSound: {fileID: 8300000, guid: f003719511aed034a85d7c20f3910de8, type: 3}
   grabSound: {fileID: 8300000, guid: b2d1360a4412b5548b6d2a888a257e87, type: 3}
   maxSprayRadius: 0.1
   maxSprayDistance: 0.4
@@ -601,6 +601,7 @@ MonoBehaviour:
   velocityThreshold: 2
   jumpAngleInDegrees: 60
   snapDistance: 0.5
+  sprayCan: {fileID: 0}
 --- !u!1 &3123823963505497844
 GameObject:
   m_ObjectHideFlags: 0
@@ -678,11 +679,11 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 5924952e7dc44a84fb098b5a3c548e20, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 23692aec494546d428f5e8c66bbb01bb, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.3
+  m_Volume: 0.1
   m_Pitch: 1
-  Loop: 1
+  Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -1031,7 +1032,7 @@ GameObject:
   - component: {fileID: 7746728111501032312}
   - component: {fileID: 367746533394373128}
   m_Layer: 8
-  m_Name: Single
+  m_Name: Grab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1062,9 +1063,9 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 8e8e8c64f1ffe28458117d52cd5295c1, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.309
+  m_Volume: 0.1
   m_Pitch: 1
   Loop: 0
   Mute: 0

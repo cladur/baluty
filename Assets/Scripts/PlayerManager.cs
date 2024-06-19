@@ -32,7 +32,7 @@ public class PlayerManager : MonoBehaviour
 
         if (hand.TryGetComponent(typeof(AudioSource), out var audioSource))
         {
-            ((AudioSource)audioSource).PlayOneShot(ladderTouchSound);
+            ((AudioSource)audioSource).PlayOneShot(ladderTouchSound, 0.1f);
         }
     }
 

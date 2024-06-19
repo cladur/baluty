@@ -34,6 +34,7 @@ public class SprayCan : MonoBehaviour
     public float resetWasInHandTime = 3.0f;
 
     private Rigidbody _rb;
+    private XRAlyxGrabInteractable _grabInteractable;
 
     private float _paintTimeLeft = 5.0f;
     private float _maxPaintTime = 15.0f;
@@ -65,6 +66,8 @@ public class SprayCan : MonoBehaviour
     void Start()
     {
         _rb = gameObject.GetComponent<Rigidbody>();
+        _grabInteractable = gameObject.GetComponent<XRAlyxGrabInteractable>();
+        _grabInteractable.sprayCan = this;
         sprayConeMesh.gameObject.SetActive(false);
         sprayCanMesh.material.SetColor(CanColorPropertyName, canColor);
         sprayCanMesh.material.SetColor(CanFillColorPropertyName, GetColor(sprayColor));
@@ -89,14 +92,14 @@ public class SprayCan : MonoBehaviour
     {
         var currentColor = GetColor(sprayColor);
 
-        UpdateFlySound();
-
         if (PlayerManager.IsGrabbed(name))
         {
-            if (_rb.velocity.magnitude > 0.25f)
-            {
-                _wasInHand = true;
-            }
+            _wasInHand = true;
+        }
+
+        if (!_wasGrabbed && PlayerManager.IsGrabbed(name))
+        {
+            PlayGrabSound();
         }
 
         if (_isSpraying)
@@ -162,7 +165,12 @@ public class SprayCan : MonoBehaviour
 
         _wasGrabbed = true;
 
-        singleShotAudioSource.PlayOneShot(grabSound);
+        singleShotAudioSource.Play();
+    }
+
+    public void PlayFlySound()
+    {
+        flyAudioSource.Play();
     }
 
     public void ResetWasInHand()
@@ -174,29 +182,6 @@ public class SprayCan : MonoBehaviour
     }
 
     private void SetWasInHandToFalse() => _wasInHand = false;
-
-    private void UpdateFlySound()
-    {
-        if (PlayerManager.IsGrabbed(name))
-        {
-            if (flyAudioSource.isPlaying)
-            {
-                flyAudioSource.Stop();
-            }
-        }
-        else
-        {
-            switch (_rb.velocity.magnitude)
-            {
-                case > 0.3f when !flyAudioSource.isPlaying:
-                    flyAudioSource.Play();
-                    break;
-                case < 0.3f when flyAudioSource.isPlaying:
-                    flyAudioSource.Stop();
-                    break;
-            }
-        }
-    }
 
     private void UpdateSprayCanColor(Color currentColor)
     {

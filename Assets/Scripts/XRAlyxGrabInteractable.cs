@@ -18,6 +18,9 @@ public class XRAlyxGrabInteractable : XRGrabInteractable
     private XRInteractionManager _manager;
     private bool _wasSnapped;
 
+    // dług technologiczny
+    public SprayCan sprayCan;
+
     protected override void Awake()
     {
         base.Awake();
@@ -58,6 +61,10 @@ public class XRAlyxGrabInteractable : XRGrabInteractable
         Drop();
         _interactableRigidbody.velocity = ComputeVelocity();
         _canJump = false;
+        if (sprayCan != null)
+        {
+            sprayCan.PlayFlySound();
+        }
     }
 
     public void ResetWasSnapped() => _wasSnapped = false;
@@ -95,7 +102,7 @@ public class XRAlyxGrabInteractable : XRGrabInteractable
         };
 
         OnSelectEntered(args);
-        interactionManager.SelectEnter((IXRSelectInteractor) hand, this);
+        interactionManager.SelectEnter((IXRSelectInteractor)hand, this);
 
         _rayInteractorGameObject.SetActive(true);
 
