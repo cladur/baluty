@@ -16,12 +16,16 @@ public class GameManager : MonoBehaviour
     // How frequently enemies are spawned
     public float enemySpawnInterval = 5.0f;
 
+    public float enemySprayDuration = 10.0f;
+    public float delayBetweenTagSplines = 3.0f;
+
     public static float PlayerScore;
     public static float EnemyScore;
-    public float enemySprayDuration = 10.0f;
-
     public delegate void ScoreUpdated(float playerScore, float enemyScore);
     public static event ScoreUpdated OnScoreUpdated;
+
+    public int maxEnemies = 3;
+    public int CurrentEnemies { get; set; }
 
     private void Awake()
     {
@@ -57,6 +61,11 @@ public class GameManager : MonoBehaviour
 
     private void SpawnEnemy()
     {
+        if (CurrentEnemies >= maxEnemies)
+        {
+            return;
+        }
+
         // Pick a random tag spot
         // TODO: Ignore the tag spots near player location
         // Shuffle the list of tag spots

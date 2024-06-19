@@ -18,18 +18,18 @@ public class TagSpot : MonoBehaviour
     [Header("Internal")]
     public GameObject enemy;
 
-    public List<TagSpline> tagSplines = new List<TagSpline>();
+    public List<TagSpline> tagSplines = new();
 
-    int _splinesOccupiedByPlayer = 0;
-    int _splinesOccupiedByEnemy = 0;
-    bool _enemyPresent = false;
-    float _timeSinceLastEnemySpawn = 0.0f;
-    float _timeSincePlayerSprayed = 0.0f;
-    TagSpline tagSplineToOverrideByEnemy = null;
-    AudioSource _sprayAudioSource;
+    private int _splinesOccupiedByPlayer;
+    private int _splinesOccupiedByEnemy;
+    private bool _enemyPresent;
+    private float _timeSinceLastEnemySpawn;
+    private float _timeSincePlayerSprayed;
+    private TagSpline _tagSplineToOverrideByEnemy;
+    private AudioSource _sprayAudioSource;
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         _sprayAudioSource = GetComponent<AudioSource>();
 
@@ -51,7 +51,7 @@ public class TagSpot : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         _timeSinceLastEnemySpawn += Time.deltaTime;
         _timeSincePlayerSprayed += Time.deltaTime;
@@ -112,41 +112,62 @@ public class TagSpot : MonoBehaviour
     public void SpawnEnemy()
     {
         // Pick a random tag spline unoccupied by the enemy
-        var randomTagSplines = tagSplines.OrderBy(x => UnityEngine.Random.value).ToList();
-
-        foreach (var tagSpline in randomTagSplines)
+        foreach (var tagSpline in tagSplines.OrderBy(_ => UnityEngine.Random.value).ToList()
+                     .Where(tagSpline => tagSpline.occupant != TagSpline.TagSplineOccupant.Enemy))
         {
-            if (tagSpline.occupant != TagSpline.TagSplineOccupant.Enemy)
-            {
-                ShowEnemy();
-                tagSplineToOverrideByEnemy = tagSpline;
-                Invoke(nameof(FinishEnemySpray), GameManager.Instance.enemySprayDuration);
-                break;
-            }
+            ShowEnemy();
+            _tagSplineToOverrideByEnemy = tagSpline;
+            Invoke(nameof(FinishEnemySpray), GameManager.Instance.enemySprayDuration);
+            return;
         }
+
+        // No more tagsplines to override here.
+        KillEnemy();
     }
 
-    void ShowEnemy()
+    private void ShowEnemy()
     {
+        if (_enemyPresent)
+        {
+            _sprayAudioSource.Play();
+            return;
+        }
+
         enemy.SetActive(true);
         _enemyPresent = true;
         _timeSinceLastEnemySpawn = 0.0f;
         _sprayAudioSource.Play();
+        GameManager.Instance.CurrentEnemies += 1;
     }
 
     public void FinishEnemySpray()
     {
+        if (_enemyPresent && _tagSplineToOverrideByEnemy != null)
+        {
+            _tagSplineToOverrideByEnemy.OvertakeByEnemy();
+            RecalculateOccupancies();
+            Debug.Log($"TagSpot_{name} overriden by enemy.");
+        }
+
+        _sprayAudioSource.Stop();
+
+        Invoke(nameof(SpawnEnemy), GameManager.Instance.delayBetweenTagSplines);
+    }
+
+    public void KillEnemy()
+    {
         enemy.SetActive(false);
 
-        if (_enemyPresent && tagSplineToOverrideByEnemy != null)
+        if (_enemyPresent && _tagSplineToOverrideByEnemy != null)
         {
-            tagSplineToOverrideByEnemy.OvertakeByEnemy();
+            _tagSplineToOverrideByEnemy.OvertakeByEnemy();
             RecalculateOccupancies();
             Debug.Log($"TagSpot_{name} overriden by enemy.");
         }
 
         _enemyPresent = false;
         _sprayAudioSource.Stop();
+        GameManager.Instance.CurrentEnemies -= 1;
     }
 
     public bool CanSpawnEnemy()
@@ -179,6 +200,6 @@ public class TagSpot : MonoBehaviour
     public void OnEnemyHit()
     {
         _enemyPresent = false;
-        FinishEnemySpray();
+        KillEnemy();
     }
 }

@@ -6,6 +6,7 @@ public class Scoreboard : MonoBehaviour
 {
     public TextMeshPro playerScoreText;
     public TextMeshPro enemyScoreText;
+    public TextMeshPro numberOfEnemiesText;
     public MeshRenderer scoreBar;
     private static readonly int FillPercent = Shader.PropertyToID("_FillPercent");
 
@@ -27,6 +28,7 @@ public class Scoreboard : MonoBehaviour
         var enemyScoreForDisplay = Mathf.Round(enemyScore * 10) / 10;
         playerScoreText.text = $"Player\n{playerScoreForDisplay}";
         enemyScoreText.text = $"Enemy\n{enemyScoreForDisplay}";
+        numberOfEnemiesText.text = $"Enemies Count \n{GameManager.Instance.CurrentEnemies}";
 
         if (playerScore == 0f && enemyScore == 0f)
         {
