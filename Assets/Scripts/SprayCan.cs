@@ -16,7 +16,6 @@ public class SprayCan : MonoBehaviour
     public Painter painter;
     public MeshRenderer sprayConeMesh;
     public MeshRenderer sprayCanMesh;
-    public TextMeshPro debugText;
     public Color canColor;
 
     public AudioSource fireAudioSource;
@@ -29,15 +28,11 @@ public class SprayCan : MonoBehaviour
 
     public float maxSprayRadius = 0.1f;
     public float maxSprayDistance = 1.0f;
-    public float velocityToShakeThreshold = 1.0f;
-    public float shakeRegenMultiplier = 1.0f;
     public float resetWasInHandTime = 3.0f;
 
     private Rigidbody _rb;
     private XRAlyxGrabInteractable _grabInteractable;
 
-    private float _paintTimeLeft = 5.0f;
-    private float _maxPaintTime = 15.0f;
     private bool _isSpraying;
     private Transform _lerpTarget;
     private bool _wasInHand;
@@ -104,25 +99,8 @@ public class SprayCan : MonoBehaviour
 
         if (_isSpraying)
         {
-            _paintTimeLeft -= Time.deltaTime;
             painter.Paint(sprayPoint.transform, maxSprayDistance, maxSprayRadius, currentColor);
             ShootRaycastForTagSplineColliders();
-
-            if (_paintTimeLeft <= 0)
-            {
-                StopSpray();
-            }
-        }
-
-        debugText.text = "Paint Time Left: " + _paintTimeLeft.ToString("F2") + "\n" + "Velocity: " + _rb.velocity.magnitude.ToString("F2");
-
-        // If spray can is shaken, add to paint time
-        if (_rb.velocity.magnitude > velocityToShakeThreshold &&
-            !_isSpraying &&
-            _paintTimeLeft < _maxPaintTime && PlayerManager.IsGrabbed(name))
-        {
-            _paintTimeLeft += Time.deltaTime * shakeRegenMultiplier;
-            _paintTimeLeft = Mathf.Clamp(_paintTimeLeft, 0, _maxPaintTime);
         }
 
         // shakeAudioSource.volume = Mathf.Clamp01((_rb.velocity.magnitude - 1.0f) / 4);
@@ -140,10 +118,6 @@ public class SprayCan : MonoBehaviour
 
     public void StartSpray()
     {
-        if (_paintTimeLeft <= 0.01f)
-        {
-            return;
-        }
         _isSpraying = true;
         sprayConeMesh.gameObject.SetActive(true);
         fireAudioSource.Play();
@@ -185,8 +159,7 @@ public class SprayCan : MonoBehaviour
 
     private void UpdateSprayCanColor(Color currentColor)
     {
-        float fillPercent = Mathf.Clamp(_paintTimeLeft / _maxPaintTime, 0, 1);
-        sprayCanMesh.material.SetFloat(CanColorFillPercentPropertyName, fillPercent);
+        sprayCanMesh.material.SetFloat(CanColorFillPercentPropertyName, 1.0f);
         sprayCanMesh.material.SetColor(CanFillColorPropertyName, currentColor);
     }
 

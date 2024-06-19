@@ -109,6 +109,14 @@ public class TagSpot : MonoBehaviour
         }
     }
 
+    public void ContinueEnemy()
+    {
+        if (_enemyPresent)
+        {
+            SpawnEnemy();
+        }
+    }
+
     public void SpawnEnemy()
     {
         // Pick a random tag spline unoccupied by the enemy
@@ -151,19 +159,12 @@ public class TagSpot : MonoBehaviour
 
         _sprayAudioSource.Stop();
 
-        Invoke(nameof(SpawnEnemy), GameManager.Instance.delayBetweenTagSplines);
+        Invoke(nameof(ContinueEnemy), GameManager.Instance.delayBetweenTagSplines);
     }
 
     public void KillEnemy()
     {
         enemy.SetActive(false);
-
-        if (_enemyPresent && _tagSplineToOverrideByEnemy != null)
-        {
-            _tagSplineToOverrideByEnemy.OvertakeByEnemy();
-            RecalculateOccupancies();
-            Debug.Log($"TagSpot_{name} overriden by enemy.");
-        }
 
         _enemyPresent = false;
         _sprayAudioSource.Stop();

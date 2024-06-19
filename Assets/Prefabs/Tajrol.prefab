@@ -43,7 +43,7 @@ GameObject:
   - component: {fileID: 4625513623984714209}
   - component: {fileID: 6639739210115524073}
   - component: {fileID: 1248892077828700751}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: MoverCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -110,7 +110,7 @@ GameObject:
   - component: {fileID: 3261208659223860134}
   - component: {fileID: 372380710362567615}
   - component: {fileID: 6914968878258534908}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: MoverCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
