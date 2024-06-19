@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -16,6 +17,25 @@ public class PlayerManager : MonoBehaviour
     public InteractionLayerMask noTeleportMask;
 
     private GameObject _previousTeleportArea;
+
+    public AudioClip ladderTouchSound;
+
+    public bool lastHandWasLeft;
+
+    public void SetLastHand(bool isLeft)
+    {
+        lastHandWasLeft = isLeft;
+    }
+
+    public void PlayLadderTouchSound()
+    {
+        var hand = lastHandWasLeft ? leftHand : rightHand;
+
+        if (hand.TryGetComponent(typeof(AudioSource), out var audioSource))
+        {
+            ((AudioSource)audioSource).PlayOneShot(ladderTouchSound);
+        }
+    }
 
     private void Update()
     {

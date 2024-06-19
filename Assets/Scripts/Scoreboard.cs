@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using UnityEngine;
 
@@ -36,7 +35,6 @@ public class Scoreboard : MonoBehaviour
         }
 
         float fillPercent = 1.0f - (playerScore / (playerScore + enemyScore));
-        Debug.Log("Fill: " + fillPercent);
         scoreBar.material.SetFloat(FillPercent, fillPercent);
     }
 }

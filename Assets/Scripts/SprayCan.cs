@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 
@@ -20,6 +21,11 @@ public class SprayCan : MonoBehaviour
 
     public AudioSource fireAudioSource;
     public AudioSource shakeAudioSource;
+    public AudioSource flyAudioSource;
+    public AudioSource singleShotAudioSource;
+
+    public AudioClip enemyHitSound;
+    public AudioClip grabSound;
 
     public float maxSprayRadius = 0.1f;
     public float maxSprayDistance = 1.0f;
@@ -34,6 +40,7 @@ public class SprayCan : MonoBehaviour
     private bool _isSpraying;
     private Transform _lerpTarget;
     private bool _wasInHand;
+    private bool _wasGrabbed;
 
     private static readonly int ColorPropertyName = Shader.PropertyToID("_Color");
     private static readonly int CanColorFillPercentPropertyName = Shader.PropertyToID("_FillHeight");
@@ -82,16 +89,14 @@ public class SprayCan : MonoBehaviour
     {
         var currentColor = GetColor(sprayColor);
 
+        UpdateFlySound();
+
         if (PlayerManager.IsGrabbed(name))
         {
             if (_rb.velocity.magnitude > 0.25f)
             {
                 _wasInHand = true;
             }
-        }
-        else if (_wasInHand)
-        {
-            Invoke(nameof(ResetWasInHand), resetWasInHandTime);
         }
 
         if (_isSpraying)
@@ -148,19 +153,57 @@ public class SprayCan : MonoBehaviour
         fireAudioSource.Stop();
     }
 
+    public void PlayGrabSound()
+    {
+        if (_wasGrabbed || !PlayerManager.IsGrabbed(name))
+        {
+            return;
+        }
+
+        _wasGrabbed = true;
+
+        singleShotAudioSource.PlayOneShot(grabSound);
+    }
+
+    public void ResetWasInHand()
+    {
+        _wasGrabbed = false;
+        _lerpTarget = null;
+
+        Invoke(nameof(SetWasInHandToFalse), 2.0f);
+    }
+
+    private void SetWasInHandToFalse() => _wasInHand = false;
+
+    private void UpdateFlySound()
+    {
+        if (PlayerManager.IsGrabbed(name))
+        {
+            if (flyAudioSource.isPlaying)
+            {
+                flyAudioSource.Stop();
+            }
+        }
+        else
+        {
+            switch (_rb.velocity.magnitude)
+            {
+                case > 0.3f when !flyAudioSource.isPlaying:
+                    flyAudioSource.Play();
+                    break;
+                case < 0.3f when flyAudioSource.isPlaying:
+                    flyAudioSource.Stop();
+                    break;
+            }
+        }
+    }
+
     private void UpdateSprayCanColor(Color currentColor)
     {
         float fillPercent = Mathf.Clamp(_paintTimeLeft / _maxPaintTime, 0, 1);
         sprayCanMesh.material.SetFloat(CanColorFillPercentPropertyName, fillPercent);
         sprayCanMesh.material.SetColor(CanFillColorPropertyName, currentColor);
     }
-
-    private void ResetWasInHand()
-    {
-        _wasInHand = false;
-        _lerpTarget = null;
-    }
-
 
     private void OnTriggerEnter(Collider other)
     {
@@ -179,6 +222,7 @@ public class SprayCan : MonoBehaviour
 
             _lerpTarget = null;
             _wasInHand = false;
+            singleShotAudioSource.PlayOneShot(enemyHitSound);
         }
     }
 }

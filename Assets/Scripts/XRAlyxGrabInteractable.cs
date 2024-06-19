@@ -16,8 +16,7 @@ public class XRAlyxGrabInteractable : XRGrabInteractable
     private XRDirectInteractor _leftHand;
     private XRDirectInteractor _rightHand;
     private XRInteractionManager _manager;
-
-
+    private bool _wasSnapped;
 
     protected override void Awake()
     {
@@ -61,11 +60,13 @@ public class XRAlyxGrabInteractable : XRGrabInteractable
         _canJump = false;
     }
 
+    public void ResetWasSnapped() => _wasSnapped = false;
+
     private void SnapToHandIfClose(XRDirectInteractor hand, float snapDistance)
     {
         var distanceToRight = Vector3.Distance(hand.transform.position, transform.position);
 
-        if (!(distanceToRight < snapDistance))
+        if (!(distanceToRight < snapDistance) || _wasSnapped)
         {
             return;
         }
@@ -99,6 +100,7 @@ public class XRAlyxGrabInteractable : XRGrabInteractable
         _rayInteractorGameObject.SetActive(true);
 
         _canJump = false;
+        _wasSnapped = true;
     }
 
     private Vector3 ComputeVelocity()
