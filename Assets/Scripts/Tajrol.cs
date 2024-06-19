@@ -8,7 +8,7 @@ public class Tajrol : MonoBehaviour
     private Vector3 _secondPosition;
     private Vector3 _targetPosition;
 
-    private bool _isFirstPosition;
+    public bool IsFirstPosition { get; set; }
     private bool _isTajroling;
     private Transform _previousPlayerParent;
 
@@ -20,7 +20,7 @@ public class Tajrol : MonoBehaviour
         _secondPosition = transform.Find("TajrolBody").transform.Find("SecondPosition").position;
 
         tajrolHold.transform.position = _firstPosition;
-        _isFirstPosition = true;
+        IsFirstPosition = true;
     }
 
     private void Update()
@@ -43,9 +43,14 @@ public class Tajrol : MonoBehaviour
         }
 
         tajrolHold.transform.position = _targetPosition;
-        _isFirstPosition = !_isFirstPosition;
+        IsFirstPosition = !IsFirstPosition;
         _targetPosition = Vector3.zero;
         _isTajroling = false;
+    }
+
+    public void MoveTajrolToOtherSide()
+    {
+        _targetPosition = IsFirstPosition ? _secondPosition : _firstPosition;
     }
 
     public void StartTajrol()
@@ -59,7 +64,7 @@ public class Tajrol : MonoBehaviour
         PlayerManager.Instance.gameObject.transform.SetParent(tajrolHold.transform);
 
         _isTajroling = true;
-        _targetPosition = _isFirstPosition ? _secondPosition : _firstPosition;
+        _targetPosition = IsFirstPosition ? _secondPosition : _firstPosition;
     }
 
     public void ResetIsTajroling()
