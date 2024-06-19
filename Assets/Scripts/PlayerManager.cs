@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -24,7 +23,7 @@ public class PlayerManager : MonoBehaviour
 
     public void SetLastHand(bool isLeft)
     {
-        lastHandWasLeft = isLeft;
+        lastHandWasLeft = !isLeft;
     }
 
     public void PlayLadderTouchSound()
