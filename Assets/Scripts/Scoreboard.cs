@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 
@@ -5,14 +6,16 @@ public class Scoreboard : MonoBehaviour
 {
     public TextMeshPro playerScoreText;
     public TextMeshPro enemyScoreText;
+    public MeshRenderer scoreBar;
+    private static readonly int FillPercent = Shader.PropertyToID("_FillPercent");
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         GameManager.OnScoreUpdated += UpdateScoreboard;
     }
 
-    void UpdateScoreboard(float playerScore, float enemyScore)
+    private void UpdateScoreboard(float playerScore, float enemyScore)
     {
         if (playerScoreText == null || enemyScoreText == null)
         {
@@ -24,5 +27,14 @@ public class Scoreboard : MonoBehaviour
         var enemyScoreForDisplay = Mathf.Round(enemyScore * 10) / 10;
         playerScoreText.text = $"Player\n{playerScoreForDisplay}";
         enemyScoreText.text = $"Enemy\n{enemyScoreForDisplay}";
+
+        if (playerScore == 0f && enemyScore == 0f)
+        {
+            return;
+        }
+
+        float fillPercent = 1.0f - (playerScore / (playerScore + enemyScore));
+        Debug.Log("Fill: " + fillPercent);
+        scoreBar.material.SetFloat(FillPercent, fillPercent);
     }
 }

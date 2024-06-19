@@ -120,7 +120,7 @@ public class TagSpot : MonoBehaviour
             {
                 ShowEnemy();
                 tagSplineToOverrideByEnemy = tagSpline;
-                Invoke(nameof(FinishEnemySpray), GameManager.enemySprayDuration);
+                Invoke(nameof(FinishEnemySpray), GameManager.Instance.enemySprayDuration);
                 break;
             }
         }

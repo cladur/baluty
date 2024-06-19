@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
@@ -6,20 +5,20 @@ using System.Linq;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
-    public List<TagSpot> tagSpots = new List<TagSpot>();
+    public List<TagSpot> tagSpots = new();
 
     // How many points are awarded for full control of a tag spot
-    public float ScoreMultiplier = 0.2f;
+    public float scoreMultiplier = 0.2f;
 
     // How frequently the scores are updated
-    public float ScoreUpdateInterval = 1.0f;
+    public float scoreUpdateInterval = 1.0f;
 
     // How frequently enemies are spawned
-    public float EnemySpawnInterval = 5.0f;
+    public float enemySpawnInterval = 5.0f;
 
-    public static float playerScore = 0.0f;
-    public static float enemyScore = 0.0f;
-    public static float enemySprayDuration = 10.0f;
+    public static float PlayerScore;
+    public static float EnemyScore;
+    public float enemySprayDuration = 10.0f;
 
     public delegate void ScoreUpdated(float playerScore, float enemyScore);
     public static event ScoreUpdated OnScoreUpdated;
@@ -36,37 +35,43 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            Debug.Log("adding player score");
+            PlayerScore += 0.2f;
+        }
+    }
+
     void CheckTagSpots()
     {
         foreach (var tagSpot in tagSpots)
         {
-            playerScore += tagSpot.GetPlayerPercentage() * ScoreMultiplier;
-            enemyScore += tagSpot.GetEnemyPercentage() * ScoreMultiplier;
+            PlayerScore += tagSpot.GetPlayerPercentage() * scoreMultiplier;
+            EnemyScore += tagSpot.GetEnemyPercentage() * scoreMultiplier;
         }
 
-        OnScoreUpdated?.Invoke(playerScore, enemyScore);
+        OnScoreUpdated?.Invoke(PlayerScore, EnemyScore);
     }
 
-    void SpawnEnemy()
+    private void SpawnEnemy()
     {
         // Pick a random tag spot
         // TODO: Ignore the tag spots near player location
         // Shuffle the list of tag spots
-        var randomTagSpots = tagSpots.OrderBy(x => UnityEngine.Random.value).ToList();
+        var randomTagSpots = tagSpots.OrderBy(_ => Random.value).ToList();
 
-        foreach (var tagSpot in randomTagSpots)
+        foreach (var tagSpot in randomTagSpots.Where(tagSpot => tagSpot.CanSpawnEnemy()))
         {
-            if (tagSpot.CanSpawnEnemy())
-            {
-                tagSpot.SpawnEnemy();
-                break;
-            }
+            tagSpot.SpawnEnemy();
+            break;
         }
     }
 
     private void Start()
     {
-        InvokeRepeating(nameof(CheckTagSpots), 0, ScoreUpdateInterval);
-        InvokeRepeating(nameof(SpawnEnemy), EnemySpawnInterval, EnemySpawnInterval);
+        InvokeRepeating(nameof(CheckTagSpots), 0, scoreUpdateInterval);
+        InvokeRepeating(nameof(SpawnEnemy), enemySpawnInterval, enemySpawnInterval);
     }
 }
