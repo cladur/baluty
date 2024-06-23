@@ -8,7 +8,6 @@ using UnityEngine.Splines;
 public class TagSpline : MonoBehaviour
 {
     public SprayColor tagSplineColor;
-    // TODO: Swap those two together, player should be blue and enemy should be red
     public Texture2D playerDecalTexture;
     public Texture2D enemyDecalTexture;
     public TagSplineCollider tagSplineColliderPrefab;
@@ -43,7 +42,7 @@ public class TagSpline : MonoBehaviour
 
         var decal = GetComponent<DecalProjector>();
         decal.material = new Material(decal.material);
-        decal.material.SetTexture("_Texture", enemyDecalTexture);
+        decal.material.SetTexture("_Texture", playerDecalTexture);
     }
 
     // Start is called before the first frame update
@@ -58,7 +57,7 @@ public class TagSpline : MonoBehaviour
 
         _decalProjector = GetComponent<DecalProjector>();
         _decalProjector.material = new Material(_decalProjector.material);
-        _decalProjector.material.SetTexture("_Texture", enemyDecalTexture);
+        _decalProjector.material.SetTexture("_Texture", playerDecalTexture);
 
         _decalProjector.enabled = false;
 
@@ -152,7 +151,7 @@ public class TagSpline : MonoBehaviour
     {
         occupant = TagSplineOccupant.Player;
         _decalProjector.enabled = true;
-        _decalProjector.material.SetTexture("_Texture", enemyDecalTexture);
+        _decalProjector.material.SetTexture("_Texture", playerDecalTexture);
         UpdateVisibility(false);
         tagSpot.OnTagSplineChanged(true);
     }
@@ -161,7 +160,7 @@ public class TagSpline : MonoBehaviour
     {
         occupant = TagSplineOccupant.Enemy;
         _decalProjector.enabled = true;
-        _decalProjector.material.SetTexture("_Texture", playerDecalTexture);
+        _decalProjector.material.SetTexture("_Texture", enemyDecalTexture);
         UpdateVisibility(true);
         tagSpot.OnTagSplineChanged(false);
     }

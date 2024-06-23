@@ -4,7 +4,7 @@ using UnityEngine;
 
 public enum SprayColor
 {
-    Red,
+    Violet,
     Green,
     Blue
 }
@@ -47,8 +47,8 @@ public class SprayCan : MonoBehaviour
     {
         switch (sprayColor)
         {
-            case SprayColor.Red:
-                return Color.red;
+            case SprayColor.Violet:
+                return Color.magenta;
             case SprayColor.Green:
                 return Color.green;
             case SprayColor.Blue:
