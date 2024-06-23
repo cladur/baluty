@@ -19,7 +19,6 @@ public class TajrolMover : MonoBehaviour
 
         if (tajrol.IsFirstPosition != isFirstPosition)
         {
-            Debug.Log("Moving Tajrol to other side");
             tajrol.MoveTajrolToOtherSide();
         }
     }
