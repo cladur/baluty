@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEditor.Rendering;
 using UnityEngine;
@@ -34,49 +33,33 @@ public class TagSpline : MonoBehaviour
 
     void OnValidate()
     {
-        try
-        {
-            _splineContainer = GetComponent<SplineContainer>();
-            _splineExtrude = GetComponent<SplineExtrude>();
+        _splineContainer = GetComponent<SplineContainer>();
+        _splineExtrude = GetComponent<SplineExtrude>();
 
-            var mesh = GetComponent<MeshRenderer>();
-            mesh.material = new Material(mesh.material);
-            mesh.material.SetColor("_Color", SprayCan.GetColor(tagSplineColor));
+        var mesh = GetComponent<MeshRenderer>();
+        mesh.material = new Material(mesh.material);
+        mesh.material.SetColor("_Color", SprayCan.GetColor(tagSplineColor));
 
-            var decal = GetComponent<DecalProjector>();
-            decal.material = new Material(decal.material);
-            decal.material.SetTexture("_Texture", playerDecalTexture);
-        }
-        catch (Exception)
-        {
-            // Ignored xd
-        }
-
+        var decal = GetComponent<DecalProjector>();
+        decal.material = new Material(decal.material);
+        decal.material.SetTexture("_Texture", playerDecalTexture);
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        try
-        {
-            _splineContainer = GetComponent<SplineContainer>();
-            _splineExtrude = GetComponent<SplineExtrude>();
+        _splineContainer = GetComponent<SplineContainer>();
+        _splineExtrude = GetComponent<SplineExtrude>();
 
-            _mesh = GetComponent<MeshRenderer>();
-            _mesh.material = new Material(_mesh.material);
-            _mesh.material.SetColor("_Color", SprayCan.GetColor(tagSplineColor));
+        _mesh = GetComponent<MeshRenderer>();
+        _mesh.material = new Material(_mesh.material);
+        _mesh.material.SetColor("_Color", SprayCan.GetColor(tagSplineColor));
 
-            _decalProjector = GetComponent<DecalProjector>();
-            _decalProjector.material = new Material(_decalProjector.material);
-            _decalProjector.material.SetTexture("_Texture", playerDecalTexture);
+        _decalProjector = GetComponent<DecalProjector>();
+        _decalProjector.material = new Material(_decalProjector.material);
+        _decalProjector.material.SetTexture("_Texture", playerDecalTexture);
 
-            _decalProjector.enabled = false;
-        }
-        catch (Exception)
-        {
-            // Ignored xd
-        }
-
+        _decalProjector.enabled = false;
 
         if (Application.isPlaying && _splineContainer != null)
         {

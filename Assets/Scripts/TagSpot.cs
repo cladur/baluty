@@ -1,6 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.Video;
 
 public class TagSpot : MonoBehaviour
 {
@@ -15,8 +19,6 @@ public class TagSpot : MonoBehaviour
     public GameObject enemy;
 
     public List<TagSpline> tagSplines = new();
-
-    public Scores currentTagScores;
 
     private int _splinesOccupiedByPlayer;
     private int _splinesOccupiedByEnemy;
@@ -194,10 +196,6 @@ public class TagSpot : MonoBehaviour
                 _splinesOccupiedByEnemy += 1;
             }
         }
-
-        currentTagScores.SetScore(
-            playerScores: _splinesOccupiedByPlayer,
-            enemyScores: _splinesOccupiedByEnemy);
     }
 
     public void OnEnemyHit()
