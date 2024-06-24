@@ -44,8 +44,9 @@ public class GameManager : MonoBehaviour
 
     public List<GameObject> showcaseSpots = new();
     public float waitTimeOnSingleShowcase = 3.0f;
+    public GameObject objectToMove;
     private Camera _mainCamera;
-    private Transform _previousCameraParent;
+    private Transform _previousParent;
     private bool _canGoToNextSpot;
     private int _tutorialStep;
 
@@ -56,10 +57,8 @@ public class GameManager : MonoBehaviour
             StartActualGame();
         }
 
-        var currentLerpTargetPosition = showcaseSpots[_tutorialStep].transform.position;
-        var currentLerpTargetRotation = showcaseSpots[_tutorialStep].transform.rotation;
-        _mainCamera.transform.position = currentLerpTargetPosition;
-        _mainCamera.transform.rotation = currentLerpTargetRotation;
+        objectToMove.transform.position = showcaseSpots[_tutorialStep].transform.position;
+        objectToMove.transform.rotation = showcaseSpots[_tutorialStep].transform.rotation;
         _tutorialStep++;
 
         Invoke(nameof(GoToNextShowcaseSpot), waitTimeOnSingleShowcase);
@@ -95,36 +94,44 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private Vector3 _startingCameraPosition;
-    private Quaternion _startingCameraRotation;
+    private Vector3 _startingPosition;
+    private Quaternion _startingRotation;
 
     public void StartMapShowcase()
     {
         Debug.Log("Map showcase started");
-        _startingCameraPosition = _mainCamera.transform.position;
-        _startingCameraRotation = _mainCamera.transform.rotation;
-        _previousCameraParent = _mainCamera.transform.parent;
-        _mainCamera.transform.parent = null;
-        _mainCamera.GetComponent<TrackedPoseDriver>().enabled = false;
+        leftController.SetActive(false);
+        rightController.SetActive(false);
+        locomotionSystem.SetActive(false);
+        _startingPosition = objectToMove.transform.position;
+        _startingRotation = objectToMove.transform.rotation;
+        _previousParent = objectToMove.transform.parent;
+        objectToMove.transform.parent = null;
+        Camera.main.GetComponent<TrackedPoseDriver>().trackingType = TrackedPoseDriver.TrackingType.RotationOnly;
 
         GoToNextShowcaseSpot();
     }
 
+    public GameObject leftController;
+    public GameObject rightController;
+    public GameObject locomotionSystem;
+
     private void StartActualGame()
     {
         Debug.Log("Actual game started");
-        _mainCamera.transform.parent = _previousCameraParent;
-        _mainCamera.transform.position = _startingCameraPosition;
-        _mainCamera.transform.rotation = _startingCameraRotation;
-        _mainCamera.GetComponent<TrackedPoseDriver>().enabled = true;
+        leftController.SetActive(true);
+        rightController.SetActive(true);
+        locomotionSystem.SetActive(true);
+        objectToMove.transform.parent = _previousParent;
+        objectToMove.transform.position = _startingPosition;
+        objectToMove.transform.rotation = _startingRotation;
+        Camera.main.GetComponent<TrackedPoseDriver>().trackingType = TrackedPoseDriver.TrackingType.RotationAndPosition;
         InvokeRepeating(nameof(CheckTagSpots), 0, scoreUpdateInterval);
         InvokeRepeating(nameof(SpawnEnemy), enemySpawnInterval, enemySpawnInterval);
     }
 
     private void Start()
     {
-        _mainCamera = Camera.main;
-
         Invoke(nameof(StartMapShowcase), 1.0f);
     }
 }
