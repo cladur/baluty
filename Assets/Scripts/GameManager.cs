@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.InputSystem.XR;
+using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
@@ -39,13 +42,27 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void Update()
+    public List<GameObject> showcaseSpots = new();
+    public float waitTimeOnSingleShowcase = 3.0f;
+    private Camera _mainCamera;
+    private Transform _previousCameraParent;
+    private bool _canGoToNextSpot;
+    private int _tutorialStep;
+
+    private void GoToNextShowcaseSpot()
     {
-        if (Input.GetKeyDown(KeyCode.X))
+        if (_tutorialStep >= showcaseSpots.Count)
         {
-            Debug.Log("adding player score");
-            PlayerScore += 0.2f;
+            StartActualGame();
         }
+
+        var currentLerpTargetPosition = showcaseSpots[_tutorialStep].transform.position;
+        var currentLerpTargetRotation = showcaseSpots[_tutorialStep].transform.rotation;
+        _mainCamera.transform.position = currentLerpTargetPosition;
+        _mainCamera.transform.rotation = currentLerpTargetRotation;
+        _tutorialStep++;
+
+        Invoke(nameof(GoToNextShowcaseSpot), waitTimeOnSingleShowcase);
     }
 
     void CheckTagSpots()
@@ -78,9 +95,36 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void Start()
+    private Vector3 _startingCameraPosition;
+    private Quaternion _startingCameraRotation;
+
+    public void StartMapShowcase()
     {
+        Debug.Log("Map showcase started");
+        _startingCameraPosition = _mainCamera.transform.position;
+        _startingCameraRotation = _mainCamera.transform.rotation;
+        _previousCameraParent = _mainCamera.transform.parent;
+        _mainCamera.transform.parent = null;
+        _mainCamera.GetComponent<TrackedPoseDriver>().enabled = false;
+
+        GoToNextShowcaseSpot();
+    }
+
+    public void StartActualGame()
+    {
+        Debug.Log("Actual game started");
+        _mainCamera.transform.parent = _previousCameraParent;
+        _mainCamera.transform.position = _startingCameraPosition;
+        _mainCamera.transform.rotation = _startingCameraRotation;
+        _mainCamera.GetComponent<TrackedPoseDriver>().enabled = true;
         InvokeRepeating(nameof(CheckTagSpots), 0, scoreUpdateInterval);
         InvokeRepeating(nameof(SpawnEnemy), enemySpawnInterval, enemySpawnInterval);
+    }
+
+    private void Start()
+    {
+        _mainCamera = Camera.main;
+
+        Invoke(nameof(StartMapShowcase), 1.0f);
     }
 }
