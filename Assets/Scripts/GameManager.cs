@@ -132,6 +132,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        Invoke(nameof(StartMapShowcase), 1.0f);
+        StartActualGame();
+        // Invoke(nameof(StartMapShowcase), 1.0f);
     }
 }

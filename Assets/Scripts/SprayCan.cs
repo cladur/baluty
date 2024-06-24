@@ -17,6 +17,7 @@ public class SprayCan : MonoBehaviour
     public MeshRenderer sprayConeMesh;
     public MeshRenderer sprayCanMesh;
     public Color canColor;
+    public GameObject vfxHitPrefab;
 
     public AudioSource fireAudioSource;
     public AudioSource shakeAudioSource;
@@ -90,6 +91,7 @@ public class SprayCan : MonoBehaviour
         if (PlayerManager.IsGrabbed(name))
         {
             _wasInHand = true;
+            _canSetWasInHandToFalse = false;
         }
 
         if (!_wasGrabbed && PlayerManager.IsGrabbed(name))
@@ -147,15 +149,26 @@ public class SprayCan : MonoBehaviour
         flyAudioSource.Play();
     }
 
+    private bool _canSetWasInHandToFalse;
+
     public void ResetWasInHand()
     {
         _wasGrabbed = false;
         _lerpTarget = null;
+        _canSetWasInHandToFalse = true;
 
         Invoke(nameof(SetWasInHandToFalse), 2.0f);
     }
 
-    private void SetWasInHandToFalse() => _wasInHand = false;
+    private void SetWasInHandToFalse()
+    {
+        if (!_canSetWasInHandToFalse)
+        {
+            return;
+        }
+
+        _wasInHand = false;
+    }
 
     private void UpdateSprayCanColor(Color currentColor)
     {
@@ -177,6 +190,11 @@ public class SprayCan : MonoBehaviour
             Debug.Log("Enemy hit!");
             var enemy = other.gameObject.GetComponent<Enemy>();
             enemy.OnHit();
+
+            var closestPoint = other.ClosestPoint(transform.position);
+            var vfx = Instantiate(vfxHitPrefab, closestPoint, Quaternion.identity);
+            vfx.GetComponent<Hit>().SetColor(GetColor(sprayColor));
+            vfx.GetComponent<Hit>().Play();
 
             _lerpTarget = null;
             _wasInHand = false;
