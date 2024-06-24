@@ -110,7 +110,7 @@ public class GameManager : MonoBehaviour
         GoToNextShowcaseSpot();
     }
 
-    public void StartActualGame()
+    private void StartActualGame()
     {
         Debug.Log("Actual game started");
         _mainCamera.transform.parent = _previousCameraParent;
