@@ -122,9 +122,9 @@ public class GameManager : MonoBehaviour
         leftController.SetActive(true);
         rightController.SetActive(true);
         locomotionSystem.SetActive(true);
-        objectToMove.transform.parent = _previousParent;
-        objectToMove.transform.position = _startingPosition;
-        objectToMove.transform.rotation = _startingRotation;
+        // objectToMove.transform.parent = _previousParent;
+        // objectToMove.transform.position = _startingPosition;
+        // objectToMove.transform.rotation = _startingRotation;
         Camera.main.GetComponent<TrackedPoseDriver>().trackingType = TrackedPoseDriver.TrackingType.RotationAndPosition;
         InvokeRepeating(nameof(CheckTagSpots), 0, scoreUpdateInterval);
         InvokeRepeating(nameof(SpawnEnemy), enemySpawnInterval, enemySpawnInterval);

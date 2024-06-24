@@ -981,7 +981,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Cursor   Dick   Fish   Monitor
+  m_text: Cursor   Duck   Fish   Monitor
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 82dbccdd78df0b14ab9b9a8b2dd9262d, type: 2}
   m_sharedMaterial: {fileID: 1255010091643355854, guid: 82dbccdd78df0b14ab9b9a8b2dd9262d,

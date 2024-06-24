@@ -25,11 +25,6 @@ public class Tajrol : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.C))
-        {
-            StartTajrol();
-        }
-
         if (_targetPosition == Vector3.zero)
         {
             return;

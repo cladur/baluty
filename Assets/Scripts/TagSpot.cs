@@ -17,6 +17,7 @@ public class TagSpot : MonoBehaviour
     public List<TagSpline> tagSplines = new();
 
     public Scores currentTagScores;
+    public bool isTutorialSpot = false;
 
     private int _splinesOccupiedByPlayer;
     private int _splinesOccupiedByEnemy;
@@ -45,7 +46,15 @@ public class TagSpot : MonoBehaviour
             }
         }
 
-        GameManager.Instance.tagSpots.Add(this);
+        if (!isTutorialSpot)
+        {
+            GameManager.Instance.tagSpots.Add(this);
+        }
+        else
+        {
+            _enemyPresent = true;
+            enemy.SetActive(true);
+        }
     }
 
     // Update is called once per frame
