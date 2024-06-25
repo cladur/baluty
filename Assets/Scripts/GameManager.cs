@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
     public List<TagSpot> tagSpots = new();
     public TextMeshPro timeText;
-    public RawImage blackImage;
+    public MeshRenderer blackThingy;
     public Transform gameFinishedTransform;
     public GameObject playerGameObject;
     private int _remainingGameSeconds = 60 * 5;
@@ -61,17 +61,12 @@ public class GameManager : MonoBehaviour
 
     private void GoToNextShowcaseSpot()
     {
-        StartCoroutine(FadeToBlackQuick());
         if (_tutorialStep >= showcaseSpots.Count)
         {
             StartActualGame();
+            return;
         }
-
-        objectToMove.transform.position = showcaseSpots[_tutorialStep].transform.position;
-        objectToMove.transform.rotation = showcaseSpots[_tutorialStep].transform.rotation;
-        _tutorialStep++;
-
-        Invoke(nameof(GoToNextShowcaseSpot), waitTimeOnSingleShowcase);
+        StartCoroutine(FadeToBlackQuick());
     }
 
     void CheckTagSpots()
@@ -89,8 +84,11 @@ public class GameManager : MonoBehaviour
     {
         if (CurrentEnemies >= maxEnemies)
         {
+            Debug.Log("Max enemies reached, can't spawn more!");
             return;
         }
+
+        Debug.Log("Spawning enemy");
 
         // Pick a random tag spot
         // TODO: Ignore the tag spots near player location
@@ -181,13 +179,19 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator FadeToBlackQuick()
     {
-        for (float i = 0; i <= 1.2; i += Time.deltaTime)
+        for (float i = 0; i <= 1.2; i += Time.deltaTime * 2.0f)
         {
-            blackImage.color = new Color(0, 0, 0, i);
+            blackThingy.sharedMaterial.color = new Color(0, 0, 0, i);
             yield return null;
         }
 
-        yield return new WaitForSeconds(1.0f);
+        objectToMove.transform.position = showcaseSpots[_tutorialStep].transform.position;
+        objectToMove.transform.rotation = showcaseSpots[_tutorialStep].transform.rotation;
+        _tutorialStep++;
+
+        yield return new WaitForSeconds(0.5f);
+
+        Invoke(nameof(GoToNextShowcaseSpot), waitTimeOnSingleShowcase);
 
         StartCoroutine(FadeFromBlack());
     }
@@ -196,7 +200,7 @@ public class GameManager : MonoBehaviour
     {
         for (float i = 0; i <= 1.2; i += Time.deltaTime)
         {
-            blackImage.color = new Color(0, 0, 0, i);
+            blackThingy.sharedMaterial.color = new Color(0, 0, 0, i);
             yield return null;
         }
 
@@ -215,7 +219,7 @@ public class GameManager : MonoBehaviour
     {
         for (float i = 1; i > 0; i -= Time.deltaTime * 2.0f)
         {
-            blackImage.color = new Color(0, 0, 0, i);
+            blackThingy.sharedMaterial.color = new Color(0, 0, 0, i);
             yield return null;
         }
     }
@@ -223,7 +227,8 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         // StartActualGame();
-        // Invoke(nameof(FinishGame), 6.0f);
+        blackThingy.sharedMaterial.color = new Color(0, 0, 0, 0);
+        // Invoke(nameof(StartMapShowcase), 3.0f);
         // Invoke(nameof(StartMapShowcase), 1.0f);
     }
 }
