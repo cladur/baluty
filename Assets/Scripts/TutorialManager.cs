@@ -5,7 +5,15 @@ public class TutorialManager : MonoBehaviour
 {
     public static TutorialManager Instance;
 
-    public TextMeshPro textAttachedToHead;
+    public GameObject welcomeText;
+    public GameObject movementText;
+    public GameObject teleportText;
+    public GameObject grabbingText;
+    public GameObject enemyText;
+    public GameObject tagSpotText;
+    public GameObject climbText;
+
+    public GameObject ladder;
 
     private void Awake()
     {
@@ -21,68 +29,82 @@ public class TutorialManager : MonoBehaviour
 
     void ShowTutorialWelcome()
     {
-        textAttachedToHead.text = "Welcome to Graffiti Master!";
+        welcomeText.SetActive(true);
         Invoke(nameof(ShowTutorialMovement), 4.0f);
     }
 
     void ShowTutorialMovement()
     {
-        textAttachedToHead.text = "Use the left stick to move around.";
+        welcomeText.SetActive(false);
+        movementText.SetActive(true);
         Invoke(nameof(ShowTutorialTeleport), 5.0f);
     }
 
     void ShowTutorialTeleport()
     {
-        textAttachedToHead.text = "Move the right stick forward to teleport.";
-        Invoke(nameof(ShowTutorialRotateView), 6.0f);
-    }
-
-    void ShowTutorialRotateView()
-    {
-        textAttachedToHead.text = "Flick right stick to the sides to rotate your view.";
+        movementText.SetActive(false);
+        teleportText.SetActive(true);
         Invoke(nameof(ShowTutorialGrabbing), 6.0f);
     }
-
     void ShowTutorialGrabbing()
     {
-        textAttachedToHead.text = "Aim at the spray can, hold the grip button and pull the hand towards you to grab it.";
+        teleportText.SetActive(false);
+        grabbingText.SetActive(true);
         // TODO: If grabbed the can, show next tutorial
         Invoke(nameof(ShowTutorialEnemy), 8.0f);
     }
 
     void ShowTutorialEnemy()
     {
-        textAttachedToHead.text = "Throw the spray can at the enemy to 'neutralize' him.";
+        grabbingText.SetActive(false);
+        enemyText.SetActive(true);
         // TODO: If hit enemy, show next tutorial
         Invoke(nameof(ShowTutorialTagSpot), 10.0f);
     }
 
     void ShowTutorialTagSpot()
     {
-        textAttachedToHead.text = "Good! Now walk up to the tag spot and spray it to claim it!";
+        enemyText.SetActive(false);
+        tagSpotText.SetActive(true);
         // TODO: If tagged the spot, show next tutorial
         Invoke(nameof(ShowTutorialClimb), 10.0f);
     }
 
     void ShowTutorialClimb()
     {
-        textAttachedToHead.text = "Well done! Now climb up the ladder to start the game!";
+        tagSpotText.SetActive(false);
+        climbText.SetActive(true);
+        ladder.SetActive(true);
         // TODO: If climbed the ladder, show next tutorial
         Invoke(nameof(FinishTutorial), 6.0f);
     }
 
     void FinishTutorial()
     {
-        textAttachedToHead.text = "";
+        climbText.SetActive(false);
+        // Invoke(nameof(StartGame), 6.0f);
+    }
+
+    void DeactivateAll()
+    {
+        welcomeText.SetActive(false);
+        movementText.SetActive(false);
+        teleportText.SetActive(false);
+        grabbingText.SetActive(false);
+        enemyText.SetActive(false);
+        tagSpotText.SetActive(false);
+        climbText.SetActive(false);
+        ladder.SetActive(false);
+    }
+
+    public void ShowTagSpots()
+    {
+        GameManager.Instance.StartMapShowcase();
     }
 
     void Start()
     {
-        if (textAttachedToHead == null)
-        {
-            Debug.LogError("Please attach a TextMeshPro object to the TutorialManager script in the inspector");
-            return;
-        }
+        DeactivateAll();
         ShowTutorialWelcome();
     }
 }

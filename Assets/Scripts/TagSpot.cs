@@ -114,6 +114,10 @@ public class TagSpot : MonoBehaviour
         {
             _timeSincePlayerSprayed = 0.0f;
         }
+        else
+        {
+            ClearPainting();
+        }
     }
 
     public void ContinueEnemy()

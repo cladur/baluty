@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     public RawImage blackImage;
     public Transform gameFinishedTransform;
     public GameObject playerGameObject;
-    private int _remainingGameSeconds = 10;
+    private int _remainingGameSeconds = 60 * 5;
 
     // How many points are awarded for full control of a tag spot
     public float scoreMultiplier = 0.2f;
@@ -51,6 +51,7 @@ public class GameManager : MonoBehaviour
     }
 
     public List<GameObject> showcaseSpots = new();
+    public GameObject vignette;
     public float waitTimeOnSingleShowcase = 3.0f;
     public GameObject objectToMove;
     private Camera _mainCamera;
@@ -60,6 +61,7 @@ public class GameManager : MonoBehaviour
 
     private void GoToNextShowcaseSpot()
     {
+        StartCoroutine(FadeToBlackQuick());
         if (_tutorialStep >= showcaseSpots.Count)
         {
             StartActualGame();
@@ -111,6 +113,7 @@ public class GameManager : MonoBehaviour
         leftController.SetActive(false);
         rightController.SetActive(false);
         locomotionSystem.SetActive(false);
+        vignette.SetActive(false);
         _startingPosition = objectToMove.transform.position;
         _startingRotation = objectToMove.transform.rotation;
         _previousParent = objectToMove.transform.parent;
@@ -124,7 +127,7 @@ public class GameManager : MonoBehaviour
     public GameObject rightController;
     public GameObject locomotionSystem;
 
-    private void StartActualGame()
+    public void StartActualGame()
     {
         Debug.Log("Actual game started");
         PlayerScore = 0;
@@ -132,9 +135,10 @@ public class GameManager : MonoBehaviour
         leftController.SetActive(true);
         rightController.SetActive(true);
         locomotionSystem.SetActive(true);
-        // objectToMove.transform.parent = _previousParent;
-        // objectToMove.transform.position = _startingPosition;
-        // objectToMove.transform.rotation = _startingRotation;
+        vignette.SetActive(true);
+        objectToMove.transform.parent = _previousParent;
+        objectToMove.transform.position = _startingPosition;
+        objectToMove.transform.rotation = _startingRotation;
         Camera.main.GetComponent<TrackedPoseDriver>().trackingType = TrackedPoseDriver.TrackingType.RotationAndPosition;
         InvokeRepeating(nameof(CheckTagSpots), 0, scoreUpdateInterval);
         InvokeRepeating(nameof(SpawnEnemy), enemySpawnInterval, enemySpawnInterval);
@@ -175,9 +179,22 @@ public class GameManager : MonoBehaviour
         StartCoroutine(FadeToBlack());
     }
 
+    private IEnumerator FadeToBlackQuick()
+    {
+        for (float i = 0; i <= 1.2; i += Time.deltaTime)
+        {
+            blackImage.color = new Color(0, 0, 0, i);
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(1.0f);
+
+        StartCoroutine(FadeFromBlack());
+    }
+
     private IEnumerator FadeToBlack()
     {
-        for (float i = 0; i < 1; i += Time.deltaTime)
+        for (float i = 0; i <= 1.2; i += Time.deltaTime)
         {
             blackImage.color = new Color(0, 0, 0, i);
             yield return null;
@@ -186,7 +203,7 @@ public class GameManager : MonoBehaviour
         string whoWon = PlayerScore > EnemyScore ? "Player" : "Enemy";
         timeText.text = $"{whoWon} won!";
 
-        yield return new WaitForSeconds(2.0f);
+        yield return new WaitForSeconds(1.0f);
 
         playerGameObject.transform.position = gameFinishedTransform.position;
         playerGameObject.transform.rotation = gameFinishedTransform.rotation;
@@ -205,7 +222,8 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        StartActualGame();
+        // StartActualGame();
+        // Invoke(nameof(FinishGame), 6.0f);
         // Invoke(nameof(StartMapShowcase), 1.0f);
     }
 }
