@@ -62,16 +62,11 @@ public class GameManager : MonoBehaviour
     private void GoToNextShowcaseSpot()
     {
         StartCoroutine(FadeToBlackQuick());
+
         if (_tutorialStep >= showcaseSpots.Count)
         {
             StartActualGame();
         }
-
-        objectToMove.transform.position = showcaseSpots[_tutorialStep].transform.position;
-        objectToMove.transform.rotation = showcaseSpots[_tutorialStep].transform.rotation;
-        _tutorialStep++;
-
-        Invoke(nameof(GoToNextShowcaseSpot), waitTimeOnSingleShowcase);
     }
 
     void CheckTagSpots()
@@ -187,7 +182,13 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
 
+        objectToMove.transform.position = showcaseSpots[_tutorialStep].transform.position;
+        objectToMove.transform.rotation = showcaseSpots[_tutorialStep].transform.rotation;
+        _tutorialStep++;
+
         yield return new WaitForSeconds(1.0f);
+
+        Invoke(nameof(GoToNextShowcaseSpot), waitTimeOnSingleShowcase);
 
         StartCoroutine(FadeFromBlack());
     }
@@ -223,7 +224,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         // StartActualGame();
-        // Invoke(nameof(FinishGame), 6.0f);
+        Invoke(nameof(StartMapShowcase), 3.0f);
         // Invoke(nameof(StartMapShowcase), 1.0f);
     }
 }
