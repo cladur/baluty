@@ -28,26 +28,36 @@ public class TagSplineCollider : MonoBehaviour
 
     public void OnShotWithPaint(SprayColor color)
     {
-        if (TagSpline.OnColliderTriggered(index, colliderQuality, color))
+        if (!TagSpline.OnColliderTriggered(index, colliderQuality, color))
         {
-            boxCollider.enabled = false;
-            // Instantiate empty object
-            var empty = new GameObject();
-            empty.transform.position = transform.position + transform.right * 0.1f;
-            var scorePopup = Instantiate(scorePopupPrefab, transform.position, Quaternion.LookRotation(-transform.right), empty.transform);
-            scorePopup.StartAnimation(colliderQuality);
-            Destroy(scorePopup.gameObject, 1.0f);
-            Destroy(empty, 1.0f);
-
-            if (colliderQuality == ColliderQuality.Perfect)
-            {
-                _audioSource.pitch = UnityEngine.Random.Range(1.2f, 1.2f);
-            }
-            else
-            {
-                _audioSource.pitch = UnityEngine.Random.Range(0.8f, 0.8f);
-            }
-            _audioSource.Play();
+            return;
         }
+
+        boxCollider.enabled = false;
+        // Instantiate empty object
+        var empty = new GameObject
+        {
+            transform =
+            {
+                position = transform.position + transform.right * 0.1f
+            }
+        };
+
+        var scorePopup = Instantiate(scorePopupPrefab, transform.position, Quaternion.LookRotation(-transform.right), empty.transform);
+        scorePopup.StartAnimation(colliderQuality);
+        Destroy(scorePopup.gameObject, 1.0f);
+        Destroy(empty, 1.0f);
+
+        if (colliderQuality == ColliderQuality.Perfect)
+        {
+            _audioSource.pitch = 1.2f;
+            GameManager.PlayerScore += 0.05f;
+        }
+        else
+        {
+            _audioSource.pitch = 0.8f;
+        }
+
+        _audioSource.Play();
     }
 }

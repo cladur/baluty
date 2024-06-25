@@ -21,14 +21,7 @@ public class ScorePopup : MonoBehaviour
 
     public void StartAnimation(ColliderQuality quality)
     {
-        if (quality == ColliderQuality.Perfect)
-        {
-            _material.SetTexture("_Texture", perfectTexture);
-        }
-        else
-        {
-            _material.SetTexture("_Texture", goodTexture);
-        }
+        _material.SetTexture("_Texture", quality == ColliderQuality.Perfect ? perfectTexture : goodTexture);
     }
 
     private void OnValidate()

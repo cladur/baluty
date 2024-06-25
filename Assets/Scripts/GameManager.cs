@@ -1,14 +1,22 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using TMPro;
 using UnityEngine.InputSystem.XR;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
     public List<TagSpot> tagSpots = new();
+    public TextMeshPro timeText;
+    public RawImage blackImage;
+    public Transform gameFinishedTransform;
+    public GameObject playerGameObject;
+    private int _remainingGameSeconds = 10;
 
     // How many points are awarded for full control of a tag spot
     public float scoreMultiplier = 0.2f;
@@ -119,6 +127,8 @@ public class GameManager : MonoBehaviour
     private void StartActualGame()
     {
         Debug.Log("Actual game started");
+        PlayerScore = 0;
+        EnemyScore = 0;
         leftController.SetActive(true);
         rightController.SetActive(true);
         locomotionSystem.SetActive(true);
@@ -128,6 +138,69 @@ public class GameManager : MonoBehaviour
         Camera.main.GetComponent<TrackedPoseDriver>().trackingType = TrackedPoseDriver.TrackingType.RotationAndPosition;
         InvokeRepeating(nameof(CheckTagSpots), 0, scoreUpdateInterval);
         InvokeRepeating(nameof(SpawnEnemy), enemySpawnInterval, enemySpawnInterval);
+
+        StartCoroutine(GameTimeCoroutine());
+    }
+
+    private IEnumerator GameTimeCoroutine()
+    {
+        while (_remainingGameSeconds > 0)
+        {
+            yield return new WaitForSeconds(1);
+
+            _remainingGameSeconds--;
+
+            timeText.text = $"{_remainingGameSeconds / 60:00} : {_remainingGameSeconds % 60:00}";
+        }
+
+        timeText.text = "Game finished";
+        FinishGame();
+    }
+
+    private void FinishGame()
+    {
+        CancelInvoke(nameof(CheckTagSpots));
+        CancelInvoke(nameof(SpawnEnemy));
+
+        foreach (var tagSpot in tagSpots)
+        {
+            tagSpot.KillEnemy();
+        }
+
+        leftController.SetActive(false);
+        rightController.SetActive(false);
+        locomotionSystem.SetActive(false);
+        Debug.Log("Game finished!");
+
+        StartCoroutine(FadeToBlack());
+    }
+
+    private IEnumerator FadeToBlack()
+    {
+        for (float i = 0; i < 1; i += Time.deltaTime)
+        {
+            blackImage.color = new Color(0, 0, 0, i);
+            yield return null;
+        }
+
+        string whoWon = PlayerScore > EnemyScore ? "Player" : "Enemy";
+        timeText.text = $"{whoWon} won!";
+
+        yield return new WaitForSeconds(2.0f);
+
+        playerGameObject.transform.position = gameFinishedTransform.position;
+        playerGameObject.transform.rotation = gameFinishedTransform.rotation;
+
+        StartCoroutine(FadeFromBlack());
+    }
+
+    private IEnumerator FadeFromBlack()
+    {
+        for (float i = 1; i > 0; i -= Time.deltaTime * 2.0f)
+        {
+            blackImage.color = new Color(0, 0, 0, i);
+            yield return null;
+        }
     }
 
     private void Start()
