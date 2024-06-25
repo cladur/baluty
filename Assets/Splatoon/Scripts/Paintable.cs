@@ -51,17 +51,6 @@ public class Paintable : MonoBehaviour
         Initialize();
     }
 
-    private void Update()
-    {
-        if (!Input.GetKeyDown(KeyCode.A))
-        {
-            return;
-        }
-
-        RenderTexture rt = _maskRenderTexture;
-        SaveRenderTexture(rt, gameObject.name + ".png");
-    }
-
     public void Initialize()
     {
         PaintManager.instance.initTextures(this);
@@ -87,22 +76,5 @@ public class Paintable : MonoBehaviour
         _uvIslandsRenderTexture.Release();
         _extendIslandsRenderTexture.Release();
         _supportTexture.Release();
-    }
-
-    private static void SaveRenderTexture(RenderTexture rt, string imageName = "Image.png")
-    {
-        RenderTexture.active = rt;
-        Texture2D tex = new Texture2D(rt.width, rt.height, TextureFormat.ARGB32, false);
-        tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
-        RenderTexture.active = null;
-
-        byte[] bytes;
-        bytes = tex.EncodeToPNG();
-
-        string path = $"{GraffitiFolderPath}/{imageName}";
-        System.IO.File.WriteAllBytes(path, bytes);
-        AssetDatabase.ImportAsset(path);
-        AssetDatabase.LoadAssetAtPath<Texture2D>(path);
-        Debug.Log("Saved to " + path);
     }
 }

@@ -28,6 +28,7 @@ public class GameManager : MonoBehaviour
     public float enemySpawnInterval = 5.0f;
 
     public float enemySprayDuration = 10.0f;
+    public float timeSinceLastEnemyKill = 0.0f;
     public float delayBetweenTagSplines = 3.0f;
 
     public static float PlayerScore;
@@ -88,10 +89,15 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        // If enemy was killed recently, don't spawn another one
+        if (timeSinceLastEnemyKill < 5.0f)
+        {
+            return;
+        }
+
         Debug.Log("Spawning enemy");
 
         // Pick a random tag spot
-        // TODO: Ignore the tag spots near player location
         // Shuffle the list of tag spots
         var randomTagSpots = tagSpots.OrderBy(_ => Random.value).ToList();
 
@@ -230,5 +236,10 @@ public class GameManager : MonoBehaviour
         blackThingy.sharedMaterial.color = new Color(0, 0, 0, 0);
         // Invoke(nameof(StartMapShowcase), 3.0f);
         // Invoke(nameof(StartMapShowcase), 1.0f);
+    }
+
+    private void Update()
+    {
+        timeSinceLastEnemyKill += Time.deltaTime;
     }
 }

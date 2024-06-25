@@ -102,7 +102,7 @@ public class TagSpot : MonoBehaviour
                 // Scale radius based on distance
                 float radius = 10.0f;
                 Color color = new Color(0, 0, 0, 0);
-                PaintManager.instance.paint(p, hit.point, radius, 0.5f, 0.5f, color);
+                PaintManager.instance.paint(p, hit.point, radius, 0.5f, 0.75f, color);
             }
         }
     }
@@ -175,6 +175,7 @@ public class TagSpot : MonoBehaviour
 
     public void KillEnemy()
     {
+        GameManager.Instance.timeSinceLastEnemyKill = 0.0f;
         enemy.SetActive(false);
 
         _enemyPresent = false;
