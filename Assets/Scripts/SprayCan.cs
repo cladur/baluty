@@ -157,7 +157,7 @@ public class SprayCan : MonoBehaviour
         _lerpTarget = null;
         _canSetWasInHandToFalse = true;
 
-        Invoke(nameof(SetWasInHandToFalse), 2.0f);
+        Invoke(nameof(SetWasInHandToFalse), 3.0f);
     }
 
     private void SetWasInHandToFalse()
