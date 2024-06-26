@@ -199,6 +199,7 @@ public class SprayCan : MonoBehaviour
 
             _lerpTarget = null;
             _wasInHand = false;
+            singleShotAudioSource.spatialBlend = 0.8f;
             singleShotAudioSource.PlayOneShot(enemyHitSound);
         }
     }

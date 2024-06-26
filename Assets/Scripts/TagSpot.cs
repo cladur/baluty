@@ -26,6 +26,8 @@ public class TagSpot : MonoBehaviour
     private float _timeSincePlayerSprayed;
     private TagSpline _tagSplineToOverrideByEnemy;
     private AudioSource _sprayAudioSource;
+    public AudioSource _enemySpawnAudioSource;
+    public AudioSource _enemyHitAudioSource;
 
     // Start is called before the first frame update
     private void Start()
@@ -152,6 +154,10 @@ public class TagSpot : MonoBehaviour
             return;
         }
 
+        Debug.Log("Spawning enemy");
+        _enemySpawnAudioSource.pitch = Random.Range(0.9f, 1.1f);
+        _enemySpawnAudioSource.Play();
+
         enemy.SetActive(true);
         _enemyPresent = true;
         _timeSinceLastEnemySpawn = 0.0f;
@@ -177,6 +183,9 @@ public class TagSpot : MonoBehaviour
     {
         GameManager.Instance.timeSinceLastEnemyKill = 0.0f;
         enemy.SetActive(false);
+
+        _enemyHitAudioSource.pitch = Random.Range(0.9f, 1.1f);
+        _enemyHitAudioSource.Play();
 
         _enemyPresent = false;
         _sprayAudioSource.Stop();

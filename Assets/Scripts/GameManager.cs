@@ -210,8 +210,9 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
 
-        string whoWon = PlayerScore > EnemyScore ? "Player" : "Enemy";
+        string whoWon = PlayerScore > EnemyScore ? "Player" : "Enemies";
         timeText.text = $"{whoWon} won!";
+        timeText.fontSize = 3f;
 
         yield return new WaitForSeconds(1.0f);
 
