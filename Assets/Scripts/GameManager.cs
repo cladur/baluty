@@ -90,7 +90,7 @@ public class GameManager : MonoBehaviour
         }
 
         // If enemy was killed recently, don't spawn another one
-        if (timeSinceLastEnemyKill < 5.0f)
+        if (timeSinceLastEnemyKill < 11.0f)
         {
             return;
         }
