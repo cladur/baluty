@@ -65,8 +65,9 @@ public class SprayCan : MonoBehaviour
         _grabInteractable = gameObject.GetComponent<XRAlyxGrabInteractable>();
         _grabInteractable.sprayCan = this;
         sprayConeMesh.gameObject.SetActive(false);
-        sprayCanMesh.material.SetColor(CanColorPropertyName, canColor);
-        sprayCanMesh.material.SetColor(CanFillColorPropertyName, GetColor(sprayColor));
+        sprayCanMesh.materials[0].SetColor("_BaseColor", GetColor(sprayColor));
+        // sprayCanMesh.material.SetColor(CanColorPropertyName, canColor);
+        // sprayCanMesh.material.SetColor(CanFillColorPropertyName, GetColor(sprayColor));
         sprayConeMesh.material.SetColor(ColorPropertyName, GetColor(sprayColor));
     }
 
